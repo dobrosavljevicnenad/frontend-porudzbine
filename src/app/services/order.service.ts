@@ -35,6 +35,10 @@ export class OrderService {
     return this.http.post<Order>(this.apiUrl, order);
   }
 
+  updateOrder(id: string, data: Partial<Order>): Observable<Order> {
+    return this.http.put<Order>(`${this.apiUrl}/${id}`, data);
+  }
+
   deleteOrder(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
