@@ -1,32 +1,34 @@
-<div class="p-6 max-w-7xl mx-auto">
-  <h1 class="text-3xl font-extrabold mb-8 text-gray-900 tracking-tight">📦 Porudžbine</h1>
+<div class="p-6 max-w-5xl mx-auto space-y-8">
+  <!-- Naslov -->
+  <h1 class="text-4xl font-extrabold text-gray-900 mb-6 border-b pb-2 tracking-tight flex items-center gap-2">
+    📦 Porudžbine
+  </h1>
 
   <!-- Forma za novu porudžbinu -->
-  <form (ngSubmit)="addOrder()" class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-12 space-y-6">
-    <h2 class="text-xl font-semibold text-gray-800 border-b pb-2">Dodaj novu porudžbinu</h2>
+  <form (ngSubmit)="addOrder()" class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 space-y-4">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Dodaj novu porudžbinu</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <input [(ngModel)]="newOrder.firstName" name="firstName" placeholder="Ime" required class="input" />
-      <input [(ngModel)]="newOrder.lastName" name="lastName" placeholder="Prezime" required class="input" />
-      <input [(ngModel)]="newOrder.contactPlace" name="contactPlace" placeholder="Kontakt mesto" class="input" />
-      <input [(ngModel)]="newOrder.klimaDimensions" name="klimaDimensions" placeholder="Dimenzije klime" class="input" />
-      <input [(ngModel)]="newOrder.maskDimensions" name="maskDimensions" placeholder="Dimenzije maske" class="input" />
-      <input [(ngModel)]="newOrder.deadline" name="deadline" type="date" placeholder="Rok" class="input" />
-      <input [(ngModel)]="newOrder.maskModel" name="maskModel" placeholder="Model maske" class="input" />
-      <input [(ngModel)]="newOrder.address" name="address" placeholder="Adresa" class="input" />
-      <input [(ngModel)]="newOrder.phone" name="phone" placeholder="Telefon" class="input" />
-      <select [(ngModel)]="newOrder.treatment" name="treatment" class="input">
+    <div class="space-y-3">
+      <input [(ngModel)]="newOrder.firstName" name="firstName" placeholder="Ime" required class="input w-full" />
+      <input [(ngModel)]="newOrder.lastName" name="lastName" placeholder="Prezime" required class="input w-full" />
+      <input [(ngModel)]="newOrder.contactPlace" name="contactPlace" placeholder="Kontakt mesto" class="input w-full" />
+      <input [(ngModel)]="newOrder.klimaDimensions" name="klimaDimensions" placeholder="Dimenzije klime" class="input w-full" />
+      <input [(ngModel)]="newOrder.maskDimensions" name="maskDimensions" placeholder="Dimenzije maske" class="input w-full" />
+      <input [(ngModel)]="newOrder.deadline" name="deadline" type="date" placeholder="Rok" class="input w-full" />
+      <input [(ngModel)]="newOrder.maskModel" name="maskModel" placeholder="Model maske" class="input w-full" />
+      <input [(ngModel)]="newOrder.address" name="address" placeholder="Adresa" class="input w-full" />
+      <input [(ngModel)]="newOrder.phone" name="phone" placeholder="Telefon" class="input w-full" />
+      <select [(ngModel)]="newOrder.treatment" name="treatment" class="input w-full">
         <option value="plastifikacija">Plastifikacija</option>
         <option value="farbanje">Farbanje</option>
       </select>
-      <input [(ngModel)]="newOrder.shade" name="shade" placeholder="Boja / ton" class="input" />
-      <input [(ngModel)]="newOrder.price" name="price" type="number" placeholder="Cena (RSD)" class="input" />
+      <input [(ngModel)]="newOrder.shade" name="shade" placeholder="Boja / ton" class="input w-full" />
+      <input [(ngModel)]="newOrder.price" name="price" type="number" placeholder="Cena (RSD)" class="input w-full" />
+      <textarea [(ngModel)]="newOrder.comment" name="comment" placeholder="Komentar"
+        class="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-400 focus:outline-none min-h-[100px]"></textarea>
     </div>
 
-    <textarea [(ngModel)]="newOrder.comment" name="comment" placeholder="Komentar"
-      class="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-400 focus:outline-none min-h-[100px]"></textarea>
-
-    <div class="flex justify-end">
+    <div class="flex justify-end mt-4">
       <button type="submit"
         class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition duration-200">
         ➕ Dodaj porudžbinu
@@ -35,10 +37,11 @@
   </form>
 
   <!-- Lista porudžbina -->
-  <div *ngIf="orders.length > 0; else noOrders" class="grid gap-6">
-    <div *ngFor="let o of orders" class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300">
+  <div *ngIf="orders.length > 0; else noOrders" class="space-y-6">
+    <div *ngFor="let o of orders"
+      class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300 space-y-2">
 
-      <!-- Gornji deo sa imenom i akcijama -->
+      <!-- Header -->
       <div class="flex justify-between items-center mb-3">
         <h3 class="text-xl font-semibold text-gray-800">{{ o.firstName }} {{ o.lastName }}</h3>
         <div class="flex gap-2">
@@ -53,9 +56,9 @@
         </div>
       </div>
 
-      <!-- Prikaz porudžbine ako nije u režimu uređivanja -->
+      <!-- Prikaz porudžbine -->
       <ng-container *ngIf="editingOrder?._id !== o._id; else editTemplate">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-700 text-sm">
+        <div class="space-y-1 text-gray-700 text-sm">
           <div><span class="font-semibold">📍 Kontakt mesto:</span> {{ o.contactPlace || '-' }}</div>
           <div><span class="font-semibold">📏 Dimenzije klime:</span> {{ o.klimaDimensions || '-' }}</div>
           <div><span class="font-semibold">📐 Dimenzije maske:</span> {{ o.maskDimensions || '-' }}</div>
@@ -66,34 +69,29 @@
           <div><span class="font-semibold">⚙️ Tretman:</span> {{ o.treatment }}</div>
           <div><span class="font-semibold">🎨 Boja/ton:</span> {{ o.shade || '-' }}</div>
           <div><span class="font-semibold">💰 Cena:</span> {{ o.price ? (o.price + ' RSD') : '-' }}</div>
-          <div class="col-span-2"><span class="font-semibold">📝 Komentar:</span> {{ o.comment || '-' }}</div>
-          <div class="col-span-2 text-right text-gray-400 text-xs">
-            ⏰ Kreirano: {{ o.createdAt | date:'short' }}
-          </div>
+          <div><span class="font-semibold">📝 Komentar:</span> {{ o.comment || '-' }}</div>
+          <div class="text-right text-gray-400 text-xs">⏰ Kreirano: {{ o.createdAt | date:'short' }}</div>
         </div>
       </ng-container>
 
-      <!-- Template za uređivanje -->
+      <!-- Edit režim -->
       <ng-template #editTemplate let-eo="editingOrder">
-        <div *ngIf="editingOrder as eo" class="space-y-2 mt-3">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <input [(ngModel)]="eo.firstName" placeholder="Ime" class="input" />
-            <input [(ngModel)]="eo.lastName" placeholder="Prezime" class="input" />
-            <input [(ngModel)]="eo.contactPlace" placeholder="Kontakt mesto" class="input" />
-            <input [(ngModel)]="eo.klimaDimensions" placeholder="Dimenzije klime" class="input" />
-            <input [(ngModel)]="eo.maskDimensions" placeholder="Dimenzije maske" class="input" />
-            <input [(ngModel)]="eo.deadline" type="date" class="input" />
-            <input [(ngModel)]="eo.maskModel" placeholder="Model maske" class="input" />
-            <input [(ngModel)]="eo.address" placeholder="Adresa" class="input" />
-            <input [(ngModel)]="eo.phone" placeholder="Telefon" class="input" />
-            <select [(ngModel)]="eo.treatment" class="input">
-              <option value="plastifikacija">Plastifikacija</option>
-              <option value="farbanje">Farbanje</option>
-            </select>
-            <input [(ngModel)]="eo.shade" placeholder="Boja / ton" class="input" />
-            <input [(ngModel)]="eo.price" type="number" placeholder="Cena (RSD)" class="input" />
-          </div>
-
+        <div *ngIf="editingOrder as eo" class="bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-inner space-y-3">
+          <input [(ngModel)]="eo.firstName" placeholder="Ime" class="input w-full" />
+          <input [(ngModel)]="eo.lastName" placeholder="Prezime" class="input w-full" />
+          <input [(ngModel)]="eo.contactPlace" placeholder="Kontakt mesto" class="input w-full" />
+          <input [(ngModel)]="eo.klimaDimensions" placeholder="Dimenzije klime" class="input w-full" />
+          <input [(ngModel)]="eo.maskDimensions" placeholder="Dimenzije maske" class="input w-full" />
+          <input [(ngModel)]="eo.deadline" type="date" class="input w-full" />
+          <input [(ngModel)]="eo.maskModel" placeholder="Model maske" class="input w-full" />
+          <input [(ngModel)]="eo.address" placeholder="Adresa" class="input w-full" />
+          <input [(ngModel)]="eo.phone" placeholder="Telefon" class="input w-full" />
+          <select [(ngModel)]="eo.treatment" class="input w-full">
+            <option value="plastifikacija">Plastifikacija</option>
+            <option value="farbanje">Farbanje</option>
+          </select>
+          <input [(ngModel)]="eo.shade" placeholder="Boja / ton" class="input w-full" />
+          <input [(ngModel)]="eo.price" type="number" placeholder="Cena (RSD)" class="input w-full" />
           <textarea [(ngModel)]="eo.comment" placeholder="Komentar"
             class="border border-gray-300 p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-400 focus:outline-none min-h-[100px]"></textarea>
 
