@@ -13,11 +13,16 @@ import { FormsModule } from '@angular/forms';
 export class OrdersComponent implements OnInit {
   orders: Order[] = [];
   editingOrder: Order | null = null;
-  newOrder: Partial<Order> = { treatment: 'plastifikacija' };
+  newOrder: Partial<Order> = { deadline: '', treatment: 'plastifikacija' };
 
   constructor(private orderService: OrderService) {}
 
   ngOnInit() {
+    const today = new Date();
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 10);
+
+    this.newOrder.deadline = futureDate.toISOString().split('T')[0];
     this.loadOrders();
   }
 
