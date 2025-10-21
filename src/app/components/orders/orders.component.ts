@@ -6,14 +6,15 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports : [CommonModule, FormsModule],
-  templateUrl: './orders.component.html', // HTML fajl
-  styleUrls: ['./orders.component.scss']   // Stilovi (ako želiš poseban fajl)
+  imports: [CommonModule, FormsModule],
+  templateUrl: './orders.component.html',
+  styleUrls: ['./orders.component.scss']
 })
 export class OrdersComponent implements OnInit {
   orders: Order[] = [];
   editingOrder: Order | null = null;
-  newOrder: Partial<Order> = { deadline: '', treatment: 'plastifikacija' };
+  newOrder: Partial<Order> = { deadline: '', treatment: 'plastifikacija'};
+  filterTura: number | 'sve' = 'sve';
 
   constructor(private orderService: OrderService) {}
 
@@ -30,11 +31,19 @@ export class OrdersComponent implements OnInit {
     this.orderService.getOrders().subscribe(orders => this.orders = orders);
   }
 
+  get filteredOrders(): Order[] {
+    if (this.filterTura === 'sve') return this.orders;
+    return this.orders.filter(o => o.tura === this.filterTura);
+  }
+
   addOrder() {
     if (!this.newOrder.firstName || !this.newOrder.lastName) return;
+    if (!this.newOrder.tura) this.newOrder.tura = 1;
+    if (!this.newOrder.quantity) this.newOrder.quantity = 1;
+
     this.orderService.createOrder(this.newOrder as Order).subscribe(order => {
       this.orders.unshift(order);
-      this.newOrder = { treatment: 'plastifikacija' };
+      this.newOrder = { treatment: 'plastifikacija', tura: 1, quantity: 1 };
     });
   }
 

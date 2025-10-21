@@ -12,6 +12,8 @@
       <input [(ngModel)]="newOrder.firstName" name="firstName" placeholder="Ime" required class="input w-full" />
       <input [(ngModel)]="newOrder.lastName" name="lastName" placeholder="Prezime" required class="input w-full" />
       <input [(ngModel)]="newOrder.contactPlace" name="contactPlace" placeholder="Kontakt mesto" class="input w-full" />
+      <input [(ngModel)]="newOrder.tura" name="tura" type="number" placeholder="Tura" class="input w-full" />
+      <input [(ngModel)]="newOrder.quantity" name="kolicina" type="number" placeholder="Količina" class="input w-full" />
       <input [(ngModel)]="newOrder.klimaDimensions" name="klimaDimensions" placeholder="Dimenzije klime" class="input w-full" />
       <input [(ngModel)]="newOrder.maskDimensions" name="maskDimensions" placeholder="Dimenzije maske" class="input w-full" />
       <input [(ngModel)]="newOrder.deadline" name="deadline" type="date" placeholder="Rok" class="input w-full" />
@@ -36,9 +38,18 @@
     </div>
   </form>
 
+  <!-- Filter po turi -->
+  <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-sm">
+    <label class="font-semibold text-gray-700">Filtriraj po turi:</label>
+    <select [(ngModel)]="filterTura" class="input w-40">
+      <option value="sve">Sve ture</option>
+      <option *ngFor="let t of [1,2,3]" [value]="t">Tura {{ t }}</option>
+    </select>
+  </div>
+
   <!-- Lista porudžbina -->
   <div *ngIf="orders.length > 0; else noOrders" class="space-y-6">
-    <div *ngFor="let o of orders"
+    <div *ngFor="let o of filteredOrders"
       class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300 space-y-2">
 
       <!-- Header -->
@@ -60,13 +71,15 @@
       <ng-container *ngIf="editingOrder?._id !== o._id; else editTemplate">
         <div class="space-y-1 text-gray-700 text-sm">
           <div><span class="font-semibold">📍 Kontakt mesto:</span> {{ o.contactPlace || '-' }}</div>
+          <div><span class="font-semibold">🚚 Tura:</span> {{ o.tura || '-' }}</div>
+          <div><span class="font-semibold">🔢 Količina:</span> {{ o.quantity || '-' }}</div>
           <div><span class="font-semibold">📏 Dimenzije klime:</span> {{ o.klimaDimensions || '-' }}</div>
           <div><span class="font-semibold">📐 Dimenzije maske:</span> {{ o.maskDimensions || '-' }}</div>
           <div><span class="font-semibold">🗓 Rok:</span> {{ o.deadline | date:'mediumDate' }}</div>
           <div><span class="font-semibold">🧩 Model maske:</span> {{ o.maskModel || '-' }}</div>
           <div><span class="font-semibold">🏠 Adresa:</span> {{ o.address || '-' }}</div>
           <div><span class="font-semibold">📞 Telefon:</span> {{ o.phone || '-' }}</div>
-          <div><span class="font-semibold">⚙️ Zastita:</span> {{ o.treatment }}</div>
+          <div><span class="font-semibold">⚙️ Zaštita:</span> {{ o.treatment }}</div>
           <div><span class="font-semibold">🎨 Boja:</span> {{ o.shade || '-' }}</div>
           <div><span class="font-semibold">💰 Cena:</span> {{ o.price ? (o.price + ' RSD') : '-' }}</div>
           <div><span class="font-semibold">📝 Komentar:</span> {{ o.comment || '-' }}</div>
@@ -80,6 +93,8 @@
           <input [(ngModel)]="eo.firstName" placeholder="Ime" class="input w-full" />
           <input [(ngModel)]="eo.lastName" placeholder="Prezime" class="input w-full" />
           <input [(ngModel)]="eo.contactPlace" placeholder="Kontakt mesto" class="input w-full" />
+          <input [(ngModel)]="eo.tura" type="number" placeholder="Tura (npr. 1, 2, 3...)" class="input w-full" />
+          <input [(ngModel)]="eo.quantity" type="number" placeholder="Količina" class="input w-full" />
           <input [(ngModel)]="eo.klimaDimensions" placeholder="Dimenzije klime" class="input w-full" />
           <input [(ngModel)]="eo.maskDimensions" placeholder="Dimenzije maske" class="input w-full" />
           <input [(ngModel)]="eo.deadline" type="date" class="input w-full" />
@@ -105,7 +120,6 @@
           </div>
         </div>
       </ng-template>
-
     </div>
   </div>
 

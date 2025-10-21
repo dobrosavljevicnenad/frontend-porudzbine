@@ -6,6 +6,8 @@ export interface Order {
   _id?: string;
   firstName: string;
   lastName: string;
+  tura: number;
+  quantity: number;
   contactPlace?: string;
   klimaDimensions?: string;
   maskDimensions?: string;
