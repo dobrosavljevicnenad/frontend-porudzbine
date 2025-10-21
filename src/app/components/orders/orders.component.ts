@@ -14,7 +14,7 @@ export class OrdersComponent implements OnInit {
   orders: Order[] = [];
   editingOrder: Order | null = null;
   newOrder: Partial<Order> = { deadline: '', treatment: 'plastifikacija'};
-  filterTura: number | 'sve' = 'sve';
+  filterTura: number | null = null;
 
   constructor(private orderService: OrderService) {}
 
@@ -32,14 +32,12 @@ export class OrdersComponent implements OnInit {
   }
 
   get filteredOrders(): Order[] {
-    if (this.filterTura === 'sve') return this.orders;
+    if (this.filterTura === null) return this.orders;
     return this.orders.filter(o => o.tura === this.filterTura);
   }
 
   addOrder() {
-    if (!this.newOrder.firstName || !this.newOrder.lastName) return;
-    if (!this.newOrder.tura) this.newOrder.tura = 1;
-    if (!this.newOrder.quantity) this.newOrder.quantity = 1;
+    if (!this.newOrder.firstName) return;
 
     this.orderService.createOrder(this.newOrder as Order).subscribe(order => {
       this.orders.unshift(order);

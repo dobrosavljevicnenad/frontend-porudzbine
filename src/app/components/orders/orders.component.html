@@ -42,8 +42,8 @@
   <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-sm">
     <label class="font-semibold text-gray-700">Filtriraj po turi:</label>
     <select [(ngModel)]="filterTura" class="input w-40">
-      <option value="sve">Sve ture</option>
-      <option *ngFor="let t of [1,2,3]" [value]="t">Tura {{ t }}</option>
+      <option [ngValue]="null">Sve ture</option>
+      <option *ngFor="let t of [1,2,3]" [ngValue]="t">Tura {{ t }}</option>
     </select>
   </div>
 
@@ -93,7 +93,7 @@
           <input [(ngModel)]="eo.firstName" placeholder="Ime" class="input w-full" />
           <input [(ngModel)]="eo.lastName" placeholder="Prezime" class="input w-full" />
           <input [(ngModel)]="eo.contactPlace" placeholder="Kontakt mesto" class="input w-full" />
-          <input [(ngModel)]="eo.tura" type="number" placeholder="Tura (npr. 1, 2, 3...)" class="input w-full" />
+          <input [(ngModel)]="eo.tura" type="number" placeholder="Tura" class="input w-full" />
           <input [(ngModel)]="eo.quantity" type="number" placeholder="Količina" class="input w-full" />
           <input [(ngModel)]="eo.klimaDimensions" placeholder="Dimenzije klime" class="input w-full" />
           <input [(ngModel)]="eo.maskDimensions" placeholder="Dimenzije maske" class="input w-full" />
