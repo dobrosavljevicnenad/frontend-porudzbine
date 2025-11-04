@@ -33,12 +33,20 @@ export class OrderService {
     return this.http.get<Order[]>(this.apiUrl);
   }
 
+  getStock(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/stock`);
+  }
+
   createOrder(order: Order): Observable<Order> {
     return this.http.post<Order>(this.apiUrl, order);
   }
 
   updateOrder(id: string, data: Partial<Order>): Observable<Order> {
     return this.http.put<Order>(`${this.apiUrl}/${id}`, data);
+  }
+
+  updateStock(newValue: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/stock`, { availableBoards: newValue });
   }
 
   deleteOrder(id: string): Observable<any> {

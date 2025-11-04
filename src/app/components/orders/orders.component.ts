@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { OrderService, Order } from '../../services/order.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.scss']
 })
@@ -16,6 +17,10 @@ export class OrdersComponent implements OnInit {
   newOrder: Partial<Order> = { deadline: '', treatment: 'plastifikacija'};
   filterTura: number | null = null;
 
+  totalBoards = 0;
+  editingBoards = false;      // Da li smo u režimu izmene
+  newBoardsValue: number = 0;
+
   constructor(private orderService: OrderService) {}
 
   ngOnInit() {
@@ -24,11 +29,20 @@ export class OrdersComponent implements OnInit {
     futureDate.setDate(today.getDate() + 10);
 
     this.newOrder.deadline = futureDate.toISOString().split('T')[0];
+
     this.loadOrders();
+    this.loadStock();
   }
 
   loadOrders() {
     this.orderService.getOrders().subscribe(orders => this.orders = orders);
+  }
+
+  loadStock(){
+    this.orderService.getStock().subscribe(stock => {
+      this.totalBoards = stock.availableBoards;
+      this.newBoardsValue = stock.availableBoards;
+    })
   }
 
   get filteredOrders(): Order[] {
@@ -41,6 +55,9 @@ export class OrdersComponent implements OnInit {
 
     this.orderService.createOrder(this.newOrder as Order).subscribe(order => {
       this.orders.unshift(order);
+
+      this.loadStock();
+
       this.newOrder = { treatment: 'plastifikacija', tura: 1, quantity: 1 };
     });
   }
@@ -67,4 +84,16 @@ export class OrdersComponent implements OnInit {
       this.editingOrder = null;
     });
   }
+
+  enableEditBoards(){
+    this.editingBoards = true;
+  }
+
+  saveBoards() {
+    this.orderService.updateStock(this.newBoardsValue).subscribe(updated => {
+      this.totalBoards = updated.availableBoards;
+      this.editingBoards = false;
+    });
+  }
+
 }

@@ -1,8 +1,17 @@
 <div class="p-6 max-w-5xl mx-auto space-y-8">
-  <!-- Naslov -->
-  <h1 class="text-4xl font-extrabold text-gray-900 mb-6 border-b pb-2 tracking-tight flex items-center gap-2">
-    📦 Porudžbine
-  </h1>
+  <!-- Naslov + dugme -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 border-b pb-2 gap-4">
+    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+      📦 Porudžbine
+    </h1>
+
+    <a
+      routerLink="/sales_techniques"
+      class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition text-center sm:text-left"
+    >
+      💬 Tehnike prodaje
+    </a>
+  </div>
 
   <!-- Forma za novu porudžbinu -->
   <form (ngSubmit)="addOrder()" class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 space-y-4">
@@ -46,6 +55,34 @@
       <option *ngFor="let t of [1,2,3]" [ngValue]="t">Tura {{ t }}</option>
     </select>
   </div>
+
+
+  <div class="p-3 bg-gray-100 rounded-xl shadow mb-4">
+  <h3 class="text-lg font-semibold mb-2">📦 Stanje tabli</h3>
+
+  <div *ngIf="!editingBoards">
+    <span class="font-bold text-xl">{{ totalBoards }}</span> tabli na stanju
+    <button class="ml-4 px-3 py-1 bg-blue-600 text-white rounded" (click)="enableEditBoards()">
+      Izmeni
+    </button>
+  </div>
+
+  <div *ngIf="editingBoards" class="flex items-center gap-3">
+    <input
+      type="number"
+      [(ngModel)]="newBoardsValue"
+      class="border p-2 rounded w-32"
+    />
+    <button class="px-3 py-1 bg-green-600 text-white rounded" (click)="saveBoards()">
+      Sačuvaj
+    </button>
+    <button class="px-3 py-1 bg-gray-400 text-white rounded" (click)="editingBoards = false">
+      Odustani
+    </button>
+  </div>
+</div>
+
+
 
   <!-- Lista porudžbina -->
   <div *ngIf="orders.length > 0; else noOrders" class="space-y-6">
