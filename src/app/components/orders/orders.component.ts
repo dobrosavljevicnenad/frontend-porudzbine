@@ -18,12 +18,33 @@ export class OrdersComponent implements OnInit {
   filterTura: number | null = null;
 
   totalBoards = 0;
-  editingBoards = false;      // Da li smo u režimu izmene
+  editingBoards = false;
   newBoardsValue: number = 0;
+
+  isDarkMode = false;
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    const body = document.body;
+
+    if (this.isDarkMode) {
+      body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      body.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }
 
   constructor(private orderService: OrderService) {}
 
   ngOnInit() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      this.isDarkMode = true;
+      document.body.classList.add('dark');
+    }
+
     const today = new Date();
     const futureDate = new Date(today);
     futureDate.setDate(today.getDate() + 10);
