@@ -5,5 +5,6 @@ import { SalesTechniquesComponent } from './components/sales-techniques/sales-te
 export const routes: Routes = [
   { path: '', component: OrdersComponent },
   { path: 'sales_techniques', component: SalesTechniquesComponent },
+  { path: 'investor_payments', loadComponent: () => import('./components/uplate-investitora/uplate-investitora.component').then(m => m.UplateInvestitoraComponent) },
   { path: '**', redirectTo: '' }
 ];

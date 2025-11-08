@@ -11,6 +11,14 @@
     >
       💬 Tehnike prodaje
     </a>
+
+    <a
+      routerLink="/investor_payments"
+      class="bg-green-600 text-white px-5 py-2 rounded-xl shadow-lg hover:shadow-xl hover:bg-green-700 transition"
+    >
+      💰 Uplate investitora
+    </a>
+
   </div>
 
   <!-- Tamni/svetli režim -->
@@ -82,7 +90,7 @@
     <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">📦 Stanje tabli</h3>
 
     <div *ngIf="!editingBoards">
-      <span class="font-bold text-xl text-gray-900 dark:text-gray-100">{{ totalBoards }}</span> tabli na stanju
+      <span class="font-bold text-xl text-gray-900 dark:text-gray-100">{{ totalBoards }} </span><span class="dark:text-white">tabli na stanju</span>
       <button class="ml-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition" (click)="enableEditBoards()">
         Izmeni
       </button>
