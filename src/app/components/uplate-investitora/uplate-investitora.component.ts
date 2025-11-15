@@ -15,6 +15,7 @@ export class UplateInvestitoraComponent {
   constructor(public investmentService: InvestmentService) {
     this.investmentService.loadInvestments();
     this.investmentService.loadWithdrawals();
+    this.investmentService.loadCompanies();
   }
 
   // 📥 Form modeli
@@ -57,6 +58,20 @@ export class UplateInvestitoraComponent {
       date,
       amount: Number(this.newWithdrawal.amount)
     }).subscribe(() => this.newWithdrawal = { company: '', date: '', amount: 0 });
+  }
+
+  deleteInvestment(inv: Investment){
+    if(!inv._id ) return;
+    if(!confirm(`Da li sigurno zelite da obriste uplatu firme "${inv.company}"?`)) return;
+
+    this.investmentService.deleteInvestment(inv._id).subscribe();
+  }
+
+  deleteWithdrawal(wd: Withdrawal) {
+    if (!wd._id) return;
+    if (!confirm(`Da li sigurno želiš da obrišeš isplatu za firmu "${wd.company}"?`)) return;
+
+    this.investmentService.deleteWithdrawal(wd._id).subscribe();
   }
 
   // 🔹 Ukupni iznosi

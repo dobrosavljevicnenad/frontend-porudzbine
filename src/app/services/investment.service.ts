@@ -18,6 +18,10 @@ export interface Withdrawal {
   amount: number;
 }
 
+export interface CompanyHistory {
+  name: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -27,6 +31,7 @@ export class InvestmentService {
 
   investments = signal<Investment[]>([]);
   withdrawals = signal<Withdrawal[]>([]);
+  companies = signal<CompanyHistory[]>([]);
 
   // Učitavanje podataka sa backend-a
   loadInvestments() {
@@ -37,6 +42,11 @@ export class InvestmentService {
   loadWithdrawals() {
     this.http.get<Withdrawal[]>(`${this.API}/withdrawals`)
       .subscribe(data => this.withdrawals.set(data));
+  }
+
+  loadCompanies(){
+    this.http.get<CompanyHistory[]>(`${this.API}/companies`)
+    .subscribe(data => this.companies.set(data));
   }
 
   // Dodavanje nove investicije
@@ -50,6 +60,24 @@ export class InvestmentService {
   addWithdrawal(wd: Withdrawal): Observable<Withdrawal> {
     return this.http.post<Withdrawal>(`${this.API}/withdrawal`, wd).pipe(
       tap(() => this.loadWithdrawals())
+    );
+  }
+
+  // Brisanje investicije
+  deleteInvestment(id: string) {
+    return this.http.delete<{ id: string; message: string }>(`${this.API}/${id}`).pipe(
+      tap(() => {
+        this.investments.update(list => list.filter(inv => inv._id !== id));
+      })
+    );
+  }
+
+  // Brisanje isplate
+  deleteWithdrawal(id: string) {
+    return this.http.delete<{ id: string; message: string }>(`${this.API}/withdrawal/${id}`).pipe(
+      tap(() => {
+        this.withdrawals.update(list => list.filter(wd => wd._id !== id));
+      })
     );
   }
 }
