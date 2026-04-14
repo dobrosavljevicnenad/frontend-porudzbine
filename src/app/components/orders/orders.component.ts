@@ -3,6 +3,7 @@ import { OrderService, Order } from '../../services/order.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-orders',
@@ -23,6 +24,91 @@ export class OrdersComponent implements OnInit {
 
   isDarkMode = false;
 
+  pasteText = '';
+
+  parseAndFill() {
+    const map: Record<string, string> = {};
+
+    this.pasteText.split('\n').forEach(line => {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx === -1) return;
+      const rawKey = line.substring(0, colonIdx).trim();
+      const value = line.substring(colonIdx + 1).trim();
+      if (rawKey) map[this.normalizeKey(rawKey)] = value;
+    });
+
+    const get = (...keys: string[]): string => {
+      for (const k of keys) {
+        const v = map[this.normalizeKey(k)];
+        if (v !== undefined) return v;
+      }
+      return '';
+    };
+
+    // Konvertuj datum MM/DD/YYYY → YYYY-MM-DD
+    let deadline = this.newOrder.deadline || '';
+    const dateStr = get('Datum');
+    if (dateStr) {
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        const [m, d, y] = parts;
+        deadline = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+      }
+    }
+
+    const shade = get('Boja / ton', 'Boja/ton', 'Boja') || get('Plastifikacija');
+    const treatmentRaw = get('Plastifikacija');
+    const treatment: 'plastifikacija' | 'farbanje' = treatmentRaw
+      ? 'plastifikacija'
+      : get('Farbanje')
+      ? 'farbanje'
+      : (this.newOrder.treatment || 'plastifikacija');
+
+    const turaStr = get('Tura');
+    const quantityStr = get('Količina', 'Kolicina');
+    const priceStr = get('Cena (RSD)', 'Cena');
+
+    this.newOrder = {
+      ...this.newOrder,
+      firstName: get('Ime') || this.newOrder.firstName || '',
+      lastName: get('Prezime') || this.newOrder.lastName || '',
+      contactPlace: get('Kontakt mesto') || this.newOrder.contactPlace || '',
+      tura: turaStr ? Number(turaStr) : this.newOrder.tura,
+      quantity: quantityStr ? Number(quantityStr) : this.newOrder.quantity,
+      klimaDimensions: get('Dimenzije klime') || this.newOrder.klimaDimensions || '',
+      maskDimensions: get('Dimenzije maske') || this.newOrder.maskDimensions || '',
+      maskModel: get('Model maske') || this.newOrder.maskModel || '',
+      deadline,
+      address: get('Adresa') || this.newOrder.address || '',
+      phone: get('Telefon') || this.newOrder.phone || '',
+      treatment,
+      shade,
+      price: priceStr ? Number(priceStr) : this.newOrder.price,
+      comment: get('Komentar') || this.newOrder.comment || '',
+    };
+
+    this.pasteText = '';
+  }
+
+  private normalizeKey(key: string): string {
+    return key
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  // 👇 NOVA polja za chat
+  isChatOpen = false;
+  chatMessages: { role: 'user' | 'assistant', content: string }[] = [
+    {
+      role: 'assistant',
+      content: 'Zdravo! Ja sam asistent za maske za klimu. Možeš da me pitaš o dimenzijama, rokovima izrade, cenama ili da mi opišeš klimu pa da ti pomognem oko maske. 🙂'
+    }
+  ];
+  chatInput = '';
+  isChatLoading = false;
+
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
     const body = document.body;
@@ -36,7 +122,7 @@ export class OrdersComponent implements OnInit {
     }
   }
 
-  constructor(private orderService: OrderService) {}
+  constructor(private orderService: OrderService, private http: HttpClient) {}
 
   ngOnInit() {
     const savedTheme = localStorage.getItem('theme');
@@ -117,5 +203,58 @@ export class OrdersComponent implements OnInit {
       this.editingBoards = false;
     });
   }
+
+
+  toggleChat() {
+    this.isChatOpen = !this.isChatOpen;
+  }
+
+  sendChatMessage() {
+    const text = this.chatInput?.trim();
+    if (!text) return;
+
+    // Dodaj user poruku u UI
+    this.chatMessages.push({ role: 'user', content: text });
+    this.chatInput = '';
+    this.isChatLoading = true;
+
+    // Ovde možeš da proslediš i kontekst (npr. trenutne porudžbine, stock...)
+    const payload = {
+      message: text,
+      // primer: u budućnosti možeš da proslediš i neke podatke:
+      context: {
+        totalBoards: this.totalBoards,
+        lastOrder: this.orders[0] || null
+      }
+    };
+
+    // Backend ruta – promeni po želji putanju
+    this.http
+  .post<{ reply: string }>(
+    'https:/localhost:3000/api/orders/chat-ai',
+    payload
+  )
+  .subscribe({
+    next: (res) => {
+      this.chatMessages.push({
+        role: 'assistant',
+        content: res.reply || 'Nešto sam se zbunio, pokušaj ponovo 🙂',
+      });
+      this.isChatLoading = false;
+    },
+    error: (err) => {
+      console.error(err);
+      this.chatMessages.push({
+        role: 'assistant',
+        content:
+          'Ups, desila se greška pri komunikaciji. Proveri da li backend radi ili pokušaj kasnije.',
+      });
+      this.isChatLoading = false;
+    },
+  });
+
+  }
+
+
 
 }

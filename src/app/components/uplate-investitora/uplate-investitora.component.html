@@ -155,17 +155,31 @@
     💸 Ukupno podignuto: <b>{{ totalWithdrawn() | number }}</b> din <br />
     ✅ Preostalo: <b>{{ totalRemaining() | number }}</b> din
   </div>
+
+  <!-- 🏢 Istorija firmi -->
+  <div class="mt-10 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+    <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100 flex items-center gap-2">
+      🏢 Istorija firmi
+    </h3>
+
+    <div
+      class="flex flex-wrap gap-3"
+      *ngIf="investmentService.companies()"
+    >
+      <span
+        *ngFor="let c of investmentService.companies()"
+        class="bg-gray-100 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100
+              px-3 py-1.5 rounded-full text-sm font-medium shadow-sm
+              border border-gray-200/70 dark:border-gray-600
+              hover:bg-gray-200 dark:hover:bg-gray-600
+              transition-colors duration-200 cursor-default"
+      >
+        {{ c.name }}
+      </span>
+    </div>
+  </div>
 </div>
 
-<h3 class="text-lg font-semibold mt-10 mb-4 text-gray-800 dark:text-gray-100">🏢 Istorija firmi</h3>
 
-<div class="flex flex-wrap gap-3">
-  <span *ngFor="let c of investmentService.companies()"
-        class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100
-               px-3 py-1 rounded-full text-sm font-medium shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600
-               transition-colors duration-200 cursor-default">
-    {{ c.name }}
-  </span>
-</div>
 
 
