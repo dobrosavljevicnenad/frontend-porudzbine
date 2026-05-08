@@ -217,7 +217,6 @@ export class OrdersComponent implements OnInit {
     this.orderService.updateOrder(this.editingOrder._id, this.editingOrder).subscribe(updated => {
       this.orders = this.orders.map(o => o._id === updated._id ? updated : o);
       this.editingOrder = null;
-      this.loadOrders();
     });
   }
 
