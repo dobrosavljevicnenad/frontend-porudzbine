@@ -18,6 +18,7 @@ export interface Order {
   treatment?: 'plastifikacija' | 'farbanje';
   shade?: string;
   price?: number;
+  profit?: number;
   comment?: string;
   createdAt?: string;
 }

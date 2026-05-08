@@ -3,7 +3,6 @@ import { OrderService, Order } from '../../services/order.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-orders',
@@ -98,16 +97,45 @@ export class OrdersComponent implements OnInit {
       .replace(/[^a-z0-9]/g, '');
   }
 
-  // 👇 NOVA polja za chat
-  isChatOpen = false;
-  chatMessages: { role: 'user' | 'assistant', content: string }[] = [
-    {
-      role: 'assistant',
-      content: 'Zdravo! Ja sam asistent za maske za klimu. Možeš da me pitaš o dimenzijama, rokovima izrade, cenama ili da mi opišeš klimu pa da ti pomognem oko maske. 🙂'
+  private readonly MONTHS = ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'];
+
+  get monthlyStats() {
+    const statsMap = new Map<string, { profit: number; boards: number; year: number; month: number }>();
+
+    for (const order of this.orders) {
+      if (!order.createdAt) continue;
+      const d = new Date(order.createdAt);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      if (!statsMap.has(key)) {
+        statsMap.set(key, { profit: 0, boards: 0, year: d.getFullYear(), month: d.getMonth() });
+      }
+      const s = statsMap.get(key)!;
+      s.profit += order.profit || 0;
+      s.boards += order.quantity || 0;
     }
-  ];
-  chatInput = '';
-  isChatLoading = false;
+
+    const now = new Date();
+    const currentKey = `${now.getFullYear()}-${now.getMonth()}`;
+
+    if (!statsMap.has(currentKey)) {
+      statsMap.set(currentKey, { profit: 0, boards: 0, year: now.getFullYear(), month: now.getMonth() });
+    }
+
+    return Array.from(statsMap.entries())
+      .sort((a, b) => {
+        const [ay, am] = a[0].split('-').map(Number);
+        const [by, bm] = b[0].split('-').map(Number);
+        return by !== ay ? by - ay : bm - am;
+      })
+      .map(([key, stat]) => ({
+        label: key === currentKey
+          ? `Trenutni mesec (${this.MONTHS[stat.month]})`
+          : this.MONTHS[stat.month],
+        profit: stat.profit,
+        boards: stat.boards,
+        isCurrent: key === currentKey
+      }));
+  }
 
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
@@ -122,7 +150,7 @@ export class OrdersComponent implements OnInit {
     }
   }
 
-  constructor(private orderService: OrderService, private http: HttpClient) {}
+  constructor(private orderService: OrderService) {}
 
   ngOnInit() {
     const savedTheme = localStorage.getItem('theme');
@@ -203,58 +231,6 @@ export class OrdersComponent implements OnInit {
       this.editingBoards = false;
     });
   }
-
-
-  toggleChat() {
-    this.isChatOpen = !this.isChatOpen;
-  }
-
-  sendChatMessage() {
-    const text = this.chatInput?.trim();
-    if (!text) return;
-
-    // Dodaj user poruku u UI
-    this.chatMessages.push({ role: 'user', content: text });
-    this.chatInput = '';
-    this.isChatLoading = true;
-
-    // Ovde možeš da proslediš i kontekst (npr. trenutne porudžbine, stock...)
-    const payload = {
-      message: text,
-      // primer: u budućnosti možeš da proslediš i neke podatke:
-      context: {
-        totalBoards: this.totalBoards,
-        lastOrder: this.orders[0] || null
-      }
-    };
-
-    // Backend ruta – promeni po želji putanju
-    this.http
-  .post<{ reply: string }>(
-    'https:/localhost:3000/api/orders/chat-ai',
-    payload
-  )
-  .subscribe({
-    next: (res) => {
-      this.chatMessages.push({
-        role: 'assistant',
-        content: res.reply || 'Nešto sam se zbunio, pokušaj ponovo 🙂',
-      });
-      this.isChatLoading = false;
-    },
-    error: (err) => {
-      console.error(err);
-      this.chatMessages.push({
-        role: 'assistant',
-        content:
-          'Ups, desila se greška pri komunikaciji. Proveri da li backend radi ili pokušaj kasnije.',
-      });
-      this.isChatLoading = false;
-    },
-  });
-
-  }
-
 
 
 }
