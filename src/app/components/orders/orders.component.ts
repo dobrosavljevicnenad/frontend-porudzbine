@@ -14,8 +14,9 @@ import { RouterLink } from '@angular/router';
 export class OrdersComponent implements OnInit {
   orders: Order[] = [];
   editingOrder: Order | null = null;
-  newOrder: Partial<Order> = { deadline: '', treatment: 'plastifikacija'};
+  newOrder: Partial<Order> = { treatment: 'plastifikacija' };
   filterTura: number | null = null;
+  groupBy: 'none' | 'city' | 'shade' = 'none';
 
   totalBoards = 0;
   editingBoards = false;
@@ -44,17 +45,6 @@ export class OrdersComponent implements OnInit {
       return '';
     };
 
-    // Konvertuj datum MM/DD/YYYY → YYYY-MM-DD
-    let deadline = this.newOrder.deadline || '';
-    const dateStr = get('Datum');
-    if (dateStr) {
-      const parts = dateStr.split('/');
-      if (parts.length === 3) {
-        const [m, d, y] = parts;
-        deadline = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-      }
-    }
-
     const shade = get('Boja / ton', 'Boja/ton', 'Boja') || get('Plastifikacija');
     const treatmentRaw = get('Plastifikacija');
     const treatment: 'plastifikacija' | 'farbanje' = treatmentRaw
@@ -77,7 +67,7 @@ export class OrdersComponent implements OnInit {
       klimaDimensions: get('Dimenzije klime') || this.newOrder.klimaDimensions || '',
       maskDimensions: get('Dimenzije maske') || this.newOrder.maskDimensions || '',
       maskModel: get('Model maske') || this.newOrder.maskModel || '',
-      deadline,
+      city: get('Grad') || this.newOrder.city || '',
       address: get('Adresa') || this.newOrder.address || '',
       phone: get('Telefon') || this.newOrder.phone || '',
       treatment,
@@ -159,12 +149,6 @@ export class OrdersComponent implements OnInit {
       document.body.classList.add('dark');
     }
 
-    const today = new Date();
-    const futureDate = new Date(today);
-    futureDate.setDate(today.getDate() + 10);
-
-    this.newOrder.deadline = futureDate.toISOString().split('T')[0];
-
     this.loadOrders();
     this.loadStock();
   }
@@ -183,6 +167,25 @@ export class OrdersComponent implements OnInit {
   get filteredOrders(): Order[] {
     if (this.filterTura === null) return this.orders;
     return this.orders.filter(o => o.tura === this.filterTura);
+  }
+
+  get groupedOrders(): { key: string; orders: Order[] }[] {
+    if (this.groupBy === 'none') {
+      return [{ key: '', orders: this.filteredOrders }];
+    }
+
+    const map = new Map<string, Order[]>();
+    for (const order of this.filteredOrders) {
+      const key = this.groupBy === 'city'
+        ? (order.city?.trim() || 'Bez grada')
+        : (order.shade?.trim() || 'Bez boje');
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(order);
+    }
+
+    return Array.from(map.entries())
+      .sort((a, b) => a[0].localeCompare(b[0], 'sr'))
+      .map(([key, orders]) => ({ key, orders }));
   }
 
   addOrder() {

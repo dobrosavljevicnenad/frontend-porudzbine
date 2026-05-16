@@ -11,8 +11,8 @@ export interface Order {
   contactPlace?: string;
   klimaDimensions?: string;
   maskDimensions?: string;
-  deadline?: string;
   maskModel?: string;
+  city?: string;
   address?: string;
   phone?: string;
   treatment?: 'plastifikacija' | 'farbanje';
