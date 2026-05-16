@@ -31,6 +31,30 @@
     </button>
   </div>
 
+  <!-- Sablon za ChatGPT -->
+  <div class="backdrop-blur-xl bg-purple-50/90 dark:bg-purple-900/20 p-6 rounded-2xl shadow-xl border border-purple-300 dark:border-purple-700 space-y-3 transition">
+    <div class="flex justify-between items-center">
+      <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">📋 Sablon za ChatGPT</h2>
+      <button type="button" (click)="sablonVisible = !sablonVisible"
+        class="text-sm px-3 py-1 rounded-lg bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 hover:bg-purple-300 dark:hover:bg-purple-700 transition">
+        {{ sablonVisible ? 'Sakrij' : 'Prikaži' }}
+      </button>
+    </div>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Kopiraj sablon, pošalji ChatGPT-u zajedno sa podacima klijenta. Rezultat nalepi u <strong>Brzo popunjavanje</strong>.</p>
+
+    <div *ngIf="sablonVisible" class="space-y-3">
+      <pre class="bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-xl p-4 text-sm font-mono text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{{ sablonText }}</pre>
+      <div class="flex justify-end">
+        <button type="button" (click)="copySablon()"
+          class="px-5 py-2 rounded-lg font-semibold shadow transition text-white"
+          [class.bg-green-600]="sablonKopiran" [class.hover:bg-green-700]="sablonKopiran"
+          [class.bg-purple-600]="!sablonKopiran" [class.hover:bg-purple-700]="!sablonKopiran">
+          {{ sablonKopiran ? '✅ Kopirano!' : '📋 Kopiraj sablon' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Brzo popunjavanje forme -->
   <div class="backdrop-blur-xl bg-amber-50/90 dark:bg-amber-900/20 p-6 rounded-2xl shadow-xl border border-amber-300 dark:border-amber-700 space-y-3 transition">
     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">⚡ Brzo popunjavanje — nalepite tekst od klijenta</h2>
@@ -160,13 +184,30 @@
         <span class="font-semibold text-gray-800 dark:text-gray-100">
           {{ stat.label }}:
         </span>
-        <div class="flex gap-6 mt-1 sm:mt-0 text-sm">
+
+        <!-- Normalan prikaz -->
+        <div *ngIf="editingProfitMonth !== stat.month" class="flex items-center gap-4 mt-1 sm:mt-0 text-sm">
           <span class="text-green-700 dark:text-green-300 font-bold">
             {{ stat.profit | number }} RSD
           </span>
           <span class="text-gray-600 dark:text-gray-300">
             {{ stat.boards }} tabli
           </span>
+          <button (click)="startEditProfit(stat.month, stat.profit)"
+            class="text-xs px-2 py-0.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+            Izmeni
+          </button>
+        </div>
+
+        <!-- Edit profit -->
+        <div *ngIf="editingProfitMonth === stat.month" class="flex items-center gap-2 mt-1 sm:mt-0">
+          <input type="number" [(ngModel)]="editingProfitValue"
+            class="input-field w-36 text-sm" />
+          <span class="text-gray-500 dark:text-gray-400 text-sm">RSD</span>
+          <button (click)="saveProfit()"
+            class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition">Sačuvaj</button>
+          <button (click)="editingProfitMonth = null"
+            class="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500 transition">Odustani</button>
         </div>
       </div>
     </div>

@@ -51,6 +51,14 @@ export class OrderService {
     return this.http.put<any>(`${this.apiUrl}/stock`, { availableBoards: newValue });
   }
 
+  getMonthlyProfits(): Observable<{ month: string; profit: number }[]> {
+    return this.http.get<{ month: string; profit: number }[]>(`${this.apiUrl}/monthly-profits`);
+  }
+
+  updateMonthlyProfit(month: string, profit: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/monthly-profits/${month}`, { profit });
+  }
+
   deleteOrder(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

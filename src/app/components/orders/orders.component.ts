@@ -22,6 +22,37 @@ export class OrdersComponent implements OnInit {
   editingBoards = false;
   newBoardsValue: number = 0;
 
+  monthlyProfits: { month: string; profit: number }[] = [];
+  editingProfitMonth: string | null = null;
+  editingProfitValue: number = 0;
+
+  sablonVisible = false;
+  readonly sablonText =
+`Ime:
+Prezime:
+Kontakt mesto: /
+Tura: 1
+Količina: 1
+Dimenzije klime: /
+Dimenzije maske:
+Model maske:
+Grad:
+Adresa:
+Telefon:
+Plastifikacija:
+Boja / ton:
+Cena (RSD):
+Komentar: /`;
+
+  sablonKopiran = false;
+
+  copySablon() {
+    navigator.clipboard.writeText(this.sablonText).then(() => {
+      this.sablonKopiran = true;
+      setTimeout(() => this.sablonKopiran = false, 2000);
+    });
+  }
+
   isDarkMode = false;
 
   pasteText = '';
@@ -90,41 +121,56 @@ export class OrdersComponent implements OnInit {
   private readonly MONTHS = ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'];
 
   get monthlyStats() {
-    const statsMap = new Map<string, { profit: number; boards: number; year: number; month: number }>();
-
+    const boardsMap = new Map<string, number>();
     for (const order of this.orders) {
       if (!order.createdAt) continue;
       const d = new Date(order.createdAt);
-      const key = `${d.getFullYear()}-${d.getMonth()}`;
-      if (!statsMap.has(key)) {
-        statsMap.set(key, { profit: 0, boards: 0, year: d.getFullYear(), month: d.getMonth() });
-      }
-      const s = statsMap.get(key)!;
-      s.profit += order.profit || 0;
-      s.boards += order.quantity || 0;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      boardsMap.set(key, (boardsMap.get(key) || 0) + (order.quantity || 0));
     }
 
     const now = new Date();
-    const currentKey = `${now.getFullYear()}-${now.getMonth()}`;
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-    if (!statsMap.has(currentKey)) {
-      statsMap.set(currentKey, { profit: 0, boards: 0, year: now.getFullYear(), month: now.getMonth() });
-    }
+    const allMonths = new Set<string>([currentMonth]);
+    for (const [k] of boardsMap) allMonths.add(k);
+    for (const p of this.monthlyProfits) allMonths.add(p.month);
 
-    return Array.from(statsMap.entries())
-      .sort((a, b) => {
-        const [ay, am] = a[0].split('-').map(Number);
-        const [by, bm] = b[0].split('-').map(Number);
-        return by !== ay ? by - ay : bm - am;
-      })
-      .map(([key, stat]) => ({
-        label: key === currentKey
-          ? `Trenutni mesec (${this.MONTHS[stat.month]})`
-          : this.MONTHS[stat.month],
-        profit: stat.profit,
-        boards: stat.boards,
-        isCurrent: key === currentKey
-      }));
+    const profitMap = new Map(this.monthlyProfits.map(p => [p.month, p.profit]));
+
+    return Array.from(allMonths)
+      .sort((a, b) => b.localeCompare(a))
+      .map(month => {
+        const mon = parseInt(month.split('-')[1], 10);
+        return {
+          month,
+          label: month === currentMonth
+            ? `Trenutni mesec (${this.MONTHS[mon - 1]})`
+            : this.MONTHS[mon - 1],
+          profit: profitMap.get(month) || 0,
+          boards: boardsMap.get(month) || 0,
+          isCurrent: month === currentMonth
+        };
+      });
+  }
+
+  startEditProfit(month: string, profit: number) {
+    this.editingProfitMonth = month;
+    this.editingProfitValue = profit;
+  }
+
+  saveProfit() {
+    if (!this.editingProfitMonth) return;
+    this.orderService.updateMonthlyProfit(this.editingProfitMonth, this.editingProfitValue)
+      .subscribe(updated => {
+        const idx = this.monthlyProfits.findIndex(p => p.month === updated.month);
+        if (idx >= 0) {
+          this.monthlyProfits[idx] = updated;
+        } else {
+          this.monthlyProfits.push(updated);
+        }
+        this.editingProfitMonth = null;
+      });
   }
 
   toggleDarkMode() {
@@ -151,10 +197,15 @@ export class OrdersComponent implements OnInit {
 
     this.loadOrders();
     this.loadStock();
+    this.loadMonthlyProfits();
   }
 
   loadOrders() {
     this.orderService.getOrders().subscribe(orders => this.orders = orders);
+  }
+
+  loadMonthlyProfits() {
+    this.orderService.getMonthlyProfits().subscribe(profits => this.monthlyProfits = profits);
   }
 
   loadStock(){
