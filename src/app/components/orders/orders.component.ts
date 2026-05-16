@@ -305,6 +305,10 @@ Komentar: /`;
     }
   }
 
+  trackByMonth(_: number, stat: { month: string }): string {
+    return stat.month;
+  }
+
   trackByGroupKey(_: number, group: { key: string; orders: Order[] }): string {
     return group.key;
   }
