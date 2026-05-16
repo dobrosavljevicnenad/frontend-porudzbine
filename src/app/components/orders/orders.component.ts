@@ -207,6 +207,16 @@ export class OrdersComponent implements OnInit {
     });
   }
 
+  get eo(): Order { return this.editingOrder!; }
+
+  trackByGroupKey(_: number, group: { key: string; orders: Order[] }): string {
+    return group.key;
+  }
+
+  trackByOrderId(_: number, order: Order): string {
+    return order._id ?? '';
+  }
+
   editOrder(order: Order) {
     this.editingOrder = { ...order };
   }
