@@ -3,9 +3,63 @@
 @tailwind utilities;
 
 body {
+  @apply bg-slate-50 text-slate-900;
   transition: background-color 0.3s, color 0.3s;
 }
 
+body.dark {
+  @apply bg-slate-950 text-slate-100;
+}
+
 .input-field {
-  @apply border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none transition;
+  @apply w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2
+         bg-white dark:bg-slate-800/80 text-slate-800 dark:text-slate-100
+         placeholder-slate-400 dark:placeholder-slate-500
+         focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:outline-none
+         transition;
+}
+
+.card {
+  @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+         rounded-2xl shadow-sm;
+}
+
+.btn-primary {
+  @apply bg-indigo-600 hover:bg-indigo-700 text-white font-semibold
+         px-5 py-2 rounded-xl shadow-sm transition;
+}
+
+.btn-success {
+  @apply bg-emerald-600 hover:bg-emerald-700 text-white font-semibold
+         px-5 py-2 rounded-xl shadow-sm transition;
+}
+
+.btn-danger {
+  @apply bg-rose-500 hover:bg-rose-600 text-white font-semibold
+         px-5 py-2 rounded-xl shadow-sm transition;
+}
+
+.btn-ghost {
+  @apply px-3 py-2 rounded-xl font-medium
+         bg-slate-100 dark:bg-slate-800
+         text-slate-700 dark:text-slate-200
+         hover:bg-slate-200 dark:hover:bg-slate-700 transition;
+}
+
+.section-title {
+  @apply text-base font-semibold text-slate-700 dark:text-slate-300
+         uppercase tracking-wide mb-4;
+}
+
+.field-row {
+  @apply flex justify-between items-baseline gap-2 py-1
+         border-b border-slate-100 dark:border-slate-700/50 last:border-0;
+}
+
+.field-label {
+  @apply text-slate-500 dark:text-slate-400 text-sm shrink-0;
+}
+
+.field-value {
+  @apply text-slate-800 dark:text-slate-200 text-sm font-medium text-right;
 }

@@ -1,151 +1,127 @@
-<div class="p-6 max-w-5xl mx-auto space-y-10 transition-colors duration-300 bg-gray-100 dark:bg-gray-900 min-h-screen">
-  <!-- Naslov + dugme -->
-  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-300 dark:border-gray-700 pb-4 gap-4">
-    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight flex items-center gap-2">
-      📦 Porudžbine
+<!-- Full-width bg wrapper — fix za tamnu temu na wide screenu -->
+<div class="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+
+  <!-- ── Header ── -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-700">
+    <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-3">
+      <span class="bg-indigo-600 text-white rounded-xl p-2 text-xl leading-none">📦</span>
+      Porudžbine
     </h1>
-
-    <a
-      routerLink="/sales_techniques"
-      class="bg-blue-600 text-white px-5 py-2 rounded-xl shadow-lg hover:shadow-xl hover:bg-blue-700 transition"
-    >
-      💬 Tehnike prodaje
-    </a>
-
-    <a
-      routerLink="/investor_payments"
-      class="bg-green-600 text-white px-5 py-2 rounded-xl shadow-lg hover:shadow-xl hover:bg-green-700 transition"
-    >
-      💰 Uplate investitora
-    </a>
-
+    <div class="flex flex-wrap items-center gap-2">
+      <a routerLink="/sales_techniques" class="btn-ghost text-sm">💬 Tehnike prodaje</a>
+      <a routerLink="/investor_payments" class="btn-ghost text-sm">💰 Uplate investitora</a>
+      <button (click)="toggleDarkMode()" class="btn-ghost text-sm">
+        {{ isDarkMode ? '☀️ Svetlo' : '🌙 Tamno' }}
+      </button>
+    </div>
   </div>
 
-  <!-- Tamni/svetli režim -->
-  <div class="flex justify-end">
-    <button
-      (click)="toggleDarkMode()"
-      class="px-4 py-2 rounded-lg font-medium bg-gray-200 dark:bg-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-700 transition"
-    >
-      {{ isDarkMode ? '☀️ Svetli režim' : '🌙 Tamni režim' }}
-    </button>
-  </div>
-
-  <!-- Sablon za ChatGPT -->
-  <div class="backdrop-blur-xl bg-purple-50/90 dark:bg-purple-900/20 p-6 rounded-2xl shadow-xl border border-purple-300 dark:border-purple-700 space-y-3 transition">
+  <!-- ── Sablon za ChatGPT ── -->
+  <div class="card p-5 border-l-4 border-l-violet-500 space-y-3">
     <div class="flex justify-between items-center">
-      <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">📋 Sablon za ChatGPT</h2>
-      <button type="button" (click)="sablonVisible = !sablonVisible"
-        class="text-sm px-3 py-1 rounded-lg bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 hover:bg-purple-300 dark:hover:bg-purple-700 transition">
+      <h2 class="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+        <span class="text-violet-500">📋</span> Sablon za ChatGPT
+      </h2>
+      <button type="button" (click)="sablonVisible = !sablonVisible" class="btn-ghost text-xs py-1 px-3">
         {{ sablonVisible ? 'Sakrij' : 'Prikaži' }}
       </button>
     </div>
-    <p class="text-sm text-gray-500 dark:text-gray-400">Kopiraj sablon, pošalji ChatGPT-u zajedno sa podacima klijenta. Rezultat nalepi u <strong>Brzo popunjavanje</strong>.</p>
-
+    <p class="text-sm text-slate-500 dark:text-slate-400">
+      Kopiraj sablon → pošalji ChatGPT-u sa podacima klijenta → rezultat nalepi u <strong class="text-slate-700 dark:text-slate-300">Brzo popunjavanje</strong>.
+    </p>
     <div *ngIf="sablonVisible" class="space-y-3">
-      <pre class="bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-xl p-4 text-sm font-mono text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{{ sablonText }}</pre>
+      <pre class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-sm font-mono text-slate-700 dark:text-slate-300 whitespace-pre-wrap overflow-x-auto">{{ sablonText }}</pre>
       <div class="flex justify-end">
         <button type="button" (click)="copySablon()"
-          class="px-5 py-2 rounded-lg font-semibold shadow transition text-white"
-          [class.bg-green-600]="sablonKopiran" [class.hover:bg-green-700]="sablonKopiran"
-          [class.bg-purple-600]="!sablonKopiran" [class.hover:bg-purple-700]="!sablonKopiran">
+          class="font-semibold px-5 py-2 rounded-xl shadow-sm transition text-white text-sm"
+          [class.bg-emerald-600]="sablonKopiran" [class.hover:bg-emerald-700]="sablonKopiran"
+          [class.bg-violet-600]="!sablonKopiran" [class.hover:bg-violet-700]="!sablonKopiran">
           {{ sablonKopiran ? '✅ Kopirano!' : '📋 Kopiraj sablon' }}
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Brzo popunjavanje forme -->
-  <div class="backdrop-blur-xl bg-amber-50/90 dark:bg-amber-900/20 p-6 rounded-2xl shadow-xl border border-amber-300 dark:border-amber-700 space-y-3 transition">
-    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">⚡ Brzo popunjavanje — nalepite tekst od klijenta</h2>
-    <p class="text-sm text-gray-500 dark:text-gray-400">Nalepite poruku klijenta, kliknite dugme i sva polja će se automatski popuniti.</p>
-    <textarea
-      [(ngModel)]="pasteText"
-      name="pasteText"
-      placeholder="Ime: Pera&#10;Prezime: Perić&#10;Kontakt mesto: Novi Sad&#10;Grad: Novi Sad&#10;Tura: 1&#10;Količina: 1&#10;..."
-      class="input-field min-h-[130px] w-full font-mono text-sm"
-    ></textarea>
+  <!-- ── Brzo popunjavanje ── -->
+  <div class="card p-5 border-l-4 border-l-amber-400 space-y-3">
+    <h2 class="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+      <span class="text-amber-500">⚡</span> Brzo popunjavanje
+    </h2>
+    <p class="text-sm text-slate-500 dark:text-slate-400">Nalepite tekst od klijenta i kliknite dugme — sva polja će se automatski popuniti.</p>
+    <textarea [(ngModel)]="pasteText" name="pasteText"
+      placeholder="Ime: Pera&#10;Prezime: Perić&#10;Grad: Novi Sad&#10;Tura: 1&#10;Količina: 1&#10;..."
+      class="input-field min-h-[120px] font-mono text-sm"></textarea>
     <div class="flex justify-end">
       <button type="button" (click)="parseAndFill()"
-        class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-5 py-2 rounded-lg shadow transition">
+        class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-5 py-2 rounded-xl shadow-sm text-sm transition">
         ⚡ Popuni formu
       </button>
     </div>
   </div>
 
-  <!-- Forma za novu porudžbinu -->
-  <form
-    (ngSubmit)="addOrder()"
-    class="backdrop-blur-xl bg-white/90 dark:bg-gray-800/80 p-6 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 space-y-5 transition"
-  >
-    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">➕ Dodaj novu porudžbinu</h2>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <input [(ngModel)]="newOrder.firstName" name="firstName" placeholder="Ime" required
-        class="input-field" />
-      <input [(ngModel)]="newOrder.lastName" name="lastName" placeholder="Prezime" required
-        class="input-field" />
-      <input [(ngModel)]="newOrder.contactPlace" name="contactPlace" placeholder="Kontakt mesto"
-        class="input-field" />
-      <input [(ngModel)]="newOrder.tura" name="tura" type="number" placeholder="Tura"
-        class="input-field" />
-      <input [(ngModel)]="newOrder.quantity" name="kolicina" type="number" placeholder="Količina"
-        class="input-field" />
-      <input [(ngModel)]="newOrder.klimaDimensions" name="klimaDimensions" placeholder="Dimenzije klime"
-        class="input-field" />
-      <input [(ngModel)]="newOrder.maskDimensions" name="maskDimensions" placeholder="Dimenzije maske"
-        class="input-field" />
-      <input [(ngModel)]="newOrder.maskModel" name="maskModel" placeholder="Model maske" class="input-field" />
-      <input [(ngModel)]="newOrder.city" name="city" placeholder="Grad" class="input-field" />
-      <input [(ngModel)]="newOrder.address" name="address" placeholder="Adresa" class="input-field" />
-      <input [(ngModel)]="newOrder.phone" name="phone" placeholder="Telefon" class="input-field" />
-      <select [(ngModel)]="newOrder.treatment" name="treatment" class="input-field">
-        <option value="plastifikacija">Plastifikacija</option>
-        <option value="farbanje">Farbanje</option>
-      </select>
-      <input [(ngModel)]="newOrder.shade" name="shade" placeholder="Boja / ton" class="input-field" />
-      <input [(ngModel)]="newOrder.price" name="price" type="number" placeholder="Cena (RSD)" class="input-field" />
-      <input [(ngModel)]="newOrder.profit" name="profit" type="number" placeholder="Profit (RSD)" class="input-field" />
-    </div>
-
-    <textarea [(ngModel)]="newOrder.comment" name="comment" placeholder="Komentar"
-      class="input-field min-h-[100px] sm:col-span-2"></textarea>
-
-    <!-- Crtež -->
-    <div class="space-y-2">
-      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">📐 Crtež</label>
-      <div class="flex items-center gap-3 flex-wrap">
-        <input type="file" accept="image/*" (change)="onImageSelected($event, 'new')"
-          class="block text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300" />
-        <span class="text-sm text-gray-400 dark:text-gray-500 italic">ili Ctrl+V za nalepljivanje</span>
+  <!-- ── Nova porudžbina ── -->
+  <div class="card p-5 space-y-5">
+    <h2 class="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+      <span class="text-indigo-500">➕</span> Nova porudžbina
+    </h2>
+    <form (ngSubmit)="addOrder()" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <input [(ngModel)]="newOrder.firstName" name="firstName" placeholder="Ime" required class="input-field" />
+        <input [(ngModel)]="newOrder.lastName" name="lastName" placeholder="Prezime" required class="input-field" />
+        <input [(ngModel)]="newOrder.contactPlace" name="contactPlace" placeholder="Kontakt mesto" class="input-field" />
+        <input [(ngModel)]="newOrder.tura" name="tura" type="number" placeholder="Tura" class="input-field" />
+        <input [(ngModel)]="newOrder.quantity" name="kolicina" type="number" placeholder="Količina" class="input-field" />
+        <input [(ngModel)]="newOrder.klimaDimensions" name="klimaDimensions" placeholder="Dimenzije klime" class="input-field" />
+        <input [(ngModel)]="newOrder.maskDimensions" name="maskDimensions" placeholder="Dimenzije maske" class="input-field" />
+        <input [(ngModel)]="newOrder.maskModel" name="maskModel" placeholder="Model maske" class="input-field" />
+        <input [(ngModel)]="newOrder.city" name="city" placeholder="Grad" class="input-field" />
+        <input [(ngModel)]="newOrder.address" name="address" placeholder="Adresa" class="input-field" />
+        <input [(ngModel)]="newOrder.phone" name="phone" placeholder="Telefon" class="input-field" />
+        <select [(ngModel)]="newOrder.treatment" name="treatment" class="input-field">
+          <option value="plastifikacija">Plastifikacija</option>
+          <option value="farbanje">Farbanje</option>
+        </select>
+        <input [(ngModel)]="newOrder.shade" name="shade" placeholder="Boja / ton" class="input-field" />
+        <input [(ngModel)]="newOrder.price" name="price" type="number" placeholder="Cena (RSD)" class="input-field" />
+        <input [(ngModel)]="newOrder.profit" name="profit" type="number" placeholder="Profit (RSD)" class="input-field" />
       </div>
-      <div *ngIf="newOrder.imageBase64" class="relative inline-block">
-        <img [src]="newOrder.imageBase64" class="max-h-48 rounded-lg border border-gray-300 dark:border-gray-600 shadow" />
-        <button type="button" (click)="removeImage('new')"
-          class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-red-600">✕</button>
+
+      <textarea [(ngModel)]="newOrder.comment" name="comment" placeholder="Komentar"
+        class="input-field min-h-[80px]"></textarea>
+
+      <div class="space-y-2">
+        <p class="text-sm font-medium text-slate-600 dark:text-slate-400">📐 Crtež</p>
+        <div class="flex items-center gap-3 flex-wrap">
+          <input type="file" accept="image/*" (change)="onImageSelected($event, 'new')"
+            class="text-sm text-slate-500 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-300 transition" />
+          <span class="text-xs text-slate-400 italic">ili Ctrl+V za nalepljivanje</span>
+        </div>
+        <div *ngIf="newOrder.imageBase64" class="relative inline-block">
+          <img [src]="newOrder.imageBase64" class="max-h-48 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm" />
+          <button type="button" (click)="removeImage('new')"
+            class="absolute top-1 right-1 bg-rose-500 text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-rose-600 leading-none">✕</button>
+        </div>
       </div>
-    </div>
 
-    <div class="flex justify-end">
-      <button type="submit"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">
-        ➕ Dodaj porudžbinu
-      </button>
-    </div>
-  </form>
+      <div class="flex justify-end pt-1">
+        <button type="submit" class="btn-primary">➕ Dodaj porudžbinu</button>
+      </div>
+    </form>
+  </div>
 
-  <!-- Filter po turi + grupisanje -->
-  <div class="flex flex-wrap items-center gap-4 bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+  <!-- ── Filter + Grupisanje ── -->
+  <div class="card px-5 py-4 flex flex-wrap items-center gap-6">
     <div class="flex items-center gap-2">
-      <label class="font-semibold text-gray-700 dark:text-gray-200">Filtriraj po turi:</label>
-      <select [(ngModel)]="filterTura" class="input-field w-40">
-        <option [ngValue]="null">Sve ture</option>
+      <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Tura:</label>
+      <select [(ngModel)]="filterTura" class="input-field !w-36 !py-1.5 text-sm">
+        <option [ngValue]="null">Sve</option>
         <option *ngFor="let t of [1,2,3]" [ngValue]="t">Tura {{ t }}</option>
       </select>
     </div>
     <div class="flex items-center gap-2">
-      <label class="font-semibold text-gray-700 dark:text-gray-200">Grupiši po:</label>
-      <select [(ngModel)]="groupBy" class="input-field w-44">
+      <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Grupiši po:</label>
+      <select [(ngModel)]="groupBy" class="input-field !w-40 !py-1.5 text-sm">
         <option value="none">Bez grupisanja</option>
         <option value="city">Gradu</option>
         <option value="shade">Boji</option>
@@ -153,193 +129,198 @@
     </div>
   </div>
 
-  <!-- Stanje tabli -->
-  <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-2xl shadow border border-gray-200 dark:border-gray-700">
-    <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">📦 Stanje tabli</h3>
+  <!-- ── Stanje tabli + Mesečna zarada ── -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-    <div *ngIf="!editingBoards">
-      <span class="font-bold text-xl text-gray-900 dark:text-gray-100">{{ totalBoards }} </span><span class="dark:text-white">tabli na stanju</span>
-      <button class="ml-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition" (click)="enableEditBoards()">
-        Izmeni
-      </button>
-    </div>
-
-    <div *ngIf="editingBoards" class="flex items-center gap-3 mt-2">
-      <input type="number" [(ngModel)]="newBoardsValue" class="input-field w-32" />
-      <button class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition" (click)="saveBoards()">Sačuvaj</button>
-      <button class="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 transition" (click)="editingBoards = false">Odustani</button>
-    </div>
-  </div>
-
-  <!-- Mesečna zarada -->
-  <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-2xl shadow border border-gray-200 dark:border-gray-700">
-    <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">📊 Zarada u toku meseca</h3>
-    <div class="space-y-2">
-      <div
-        *ngFor="let stat of monthlyStats; trackBy: trackByMonth"
-        [class]="stat.isCurrent
-          ? 'flex flex-col sm:flex-row sm:items-center sm:justify-between bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-xl px-4 py-3'
-          : 'flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3'"
-      >
-        <span class="font-semibold text-gray-800 dark:text-gray-100">
-          {{ stat.label }}:
-        </span>
-
-        <!-- Normalan prikaz -->
-        <div *ngIf="editingProfitMonth !== stat.month" class="flex items-center gap-4 mt-1 sm:mt-0 text-sm">
-          <span class="text-green-700 dark:text-green-300 font-bold">
-            {{ stat.profit | number }} RSD
-          </span>
-          <span class="text-gray-600 dark:text-gray-300">
-            {{ stat.boards }} tabli
-          </span>
-          <button (click)="startEditProfit(stat.month, stat.profit)"
-            class="text-xs px-2 py-0.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition">
-            Izmeni
-          </button>
-        </div>
-
-        <!-- Edit profit -->
-        <div *ngIf="editingProfitMonth === stat.month" class="flex items-center gap-2 mt-1 sm:mt-0">
-          <input type="number" [(ngModel)]="editingProfitValue"
-            class="input-field w-36 text-sm" />
-          <span class="text-gray-500 dark:text-gray-400 text-sm">RSD</span>
-          <button (click)="saveProfit()"
-            class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition">Sačuvaj</button>
-          <button (click)="editingProfitMonth = null"
-            class="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500 transition">Odustani</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Lista porudžbina -->
-<div *ngIf="orders.length > 0; else noOrders" class="space-y-8">
-  <div *ngFor="let group of groupedOrders; trackBy: trackByGroupKey">
-    <div *ngIf="groupBy !== 'none'"
-      class="sticky top-0 z-10 bg-blue-100 dark:bg-blue-900/50 border border-blue-300 dark:border-blue-700 rounded-xl px-4 py-2 mb-3 font-bold text-blue-900 dark:text-blue-100 text-lg shadow">
-      {{ groupBy === 'city' ? '📍' : '🎨' }} {{ group.key }}
-      <span class="ml-2 text-sm font-normal text-blue-700 dark:text-blue-300">({{ group.orders.length }})</span>
-    </div>
-    <div class="space-y-6">
-  <div *ngFor="let o of group.orders; trackBy: trackByOrderId"
-    class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 space-y-2">
-
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-3">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ o.firstName }} {{ o.lastName }}</h3>
-      <div class="flex gap-2">
-        <button *ngIf="editingOrder?._id !== o._id" (click)="editOrder(o)"
-          class="text-blue-600 hover:text-blue-400 font-semibold text-sm bg-blue-50 dark:bg-blue-900/40 px-3 py-1 rounded-md transition">
-          ✏️ Izmeni
-        </button>
-        <button *ngIf="editingOrder?._id !== o._id" (click)="deleteOrder(o._id)"
-          class="text-red-600 hover:text-red-400 font-semibold text-sm bg-red-50 dark:bg-red-900/40 px-3 py-1 rounded-md transition">
-          🗑 Obriši
+    <!-- Stanje tabli -->
+    <div class="card p-5 space-y-3">
+      <p class="section-title">📦 Stanje tabli</p>
+      <div *ngIf="!editingBoards" class="flex items-center gap-3">
+        <span class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{ totalBoards }}</span>
+        <span class="text-slate-500 dark:text-slate-400 text-sm">tabli na stanju</span>
+        <button (click)="enableEditBoards()"
+          class="ml-auto text-xs px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+          Izmeni
         </button>
       </div>
+      <div *ngIf="editingBoards" class="flex items-center gap-2">
+        <input type="number" [(ngModel)]="newBoardsValue" class="input-field !w-28 !py-1.5 text-sm" />
+        <button (click)="saveBoards()" class="btn-success text-sm px-3 py-1.5">Sačuvaj</button>
+        <button (click)="editingBoards = false" class="btn-ghost text-sm px-3 py-1.5">Odustani</button>
+      </div>
     </div>
 
-    <!-- Prikaz porudžbine -->
-    <div *ngIf="editingOrder?._id !== o._id" class="space-y-1 text-gray-700 dark:text-gray-300 text-sm">
-      <div><span class="font-semibold">📍 Kontakt mesto:</span> {{ o.contactPlace || '-' }}</div>
-      <div><span class="font-semibold">🚚 Tura:</span> {{ o.tura || '-' }}</div>
-      <div><span class="font-semibold">🔢 Količina:</span> {{ o.quantity || '-' }}</div>
-      <div><span class="font-semibold">📏 Dimenzije klime:</span> {{ o.klimaDimensions || '-' }}</div>
-      <div><span class="font-semibold">📐 Dimenzije maske:</span> {{ o.maskDimensions || '-' }}</div>
-      <div><span class="font-semibold">🧩 Model maske:</span> {{ o.maskModel || '-' }}</div>
-      <div><span class="font-semibold">📍 Grad:</span> {{ o.city || '-' }}</div>
-      <div><span class="font-semibold">🏠 Adresa:</span> {{ o.address || '-' }}</div>
-      <div><span class="font-semibold">📞 Telefon:</span> {{ o.phone || '-' }}</div>
-      <div><span class="font-semibold">⚙️ Zaštita:</span> {{ o.treatment }}</div>
-      <div><span class="font-semibold">🎨 Boja:</span> {{ o.shade || '-' }}</div>
-      <div><span class="font-semibold">💰 Cena:</span> {{ o.price ? (o.price + ' RSD') : '-' }}</div>
-      <div><span class="font-semibold">📈 Profit:</span> {{ o.profit ? (o.profit + ' RSD') : '-' }}</div>
-      <div><span class="font-semibold">📝 Komentar:</span> {{ o.comment || '-' }}</div>
-      <div class="mt-2">
-        <span class="font-semibold text-sm">📐 Crtež:</span>
-        <div *ngIf="o.imageBase64; else noImage" class="mt-1">
-          <img [src]="o.imageBase64" class="max-w-full rounded-lg border border-gray-300 dark:border-gray-600 shadow" />
+    <!-- Mesečna zarada -->
+    <div class="card p-5 space-y-3">
+      <p class="section-title">📊 Zarada po mesecima</p>
+      <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+        <div *ngFor="let stat of monthlyStats; trackBy: trackByMonth"
+          class="flex items-center justify-between rounded-xl px-3 py-2 text-sm"
+          [class.bg-emerald-50]="stat.isCurrent"
+          [class.dark:bg-emerald-950\/30]="stat.isCurrent"
+          [class.border]="stat.isCurrent"
+          [class.border-emerald-200]="stat.isCurrent"
+          [class.dark:border-emerald-800]="stat.isCurrent"
+          [class.bg-slate-50]="!stat.isCurrent"
+          [class.dark:bg-slate-900\/50]="!stat.isCurrent">
+
+          <span class="text-slate-600 dark:text-slate-400 font-medium">{{ stat.label }}</span>
+
+          <div *ngIf="editingProfitMonth !== stat.month" class="flex items-center gap-3">
+            <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ stat.profit | number }} RSD</span>
+            <span class="text-slate-400 text-xs">{{ stat.boards }} tabli</span>
+            <button (click)="startEditProfit(stat.month, stat.profit)"
+              class="text-xs px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 transition">
+              Izmeni
+            </button>
+          </div>
+
+          <div *ngIf="editingProfitMonth === stat.month" class="flex items-center gap-1.5">
+            <input type="number" [(ngModel)]="editingProfitValue" class="input-field !w-28 !py-0.5 text-sm" />
+            <button (click)="saveProfit()" class="text-xs px-2 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Sačuvaj</button>
+            <button (click)="editingProfitMonth = null" class="text-xs px-2 py-1 bg-slate-400 text-white rounded-lg hover:bg-slate-500 transition">✕</button>
+          </div>
         </div>
-        <ng-template #noImage>
-          <span class="text-gray-400 italic text-sm ml-1">Nije dodata slika</span>
-        </ng-template>
-      </div>
-      <div class="text-right text-gray-400 text-xs">⏰ Kreirano: {{ o.createdAt | date:'short' }}</div>
-    </div>
-
-    <!-- Edit forma -->
-    <div *ngIf="editingOrder && editingOrder._id === o._id" class="space-y-4">
-
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          ✏️ Izmena: {{ eo.firstName }} {{ eo.lastName }}
-        </h3>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <input [(ngModel)]="eo.firstName" placeholder="Ime" class="input-field" />
-        <input [(ngModel)]="eo.lastName" placeholder="Prezime" class="input-field" />
-        <input [(ngModel)]="eo.contactPlace" placeholder="Kontakt mesto" class="input-field" />
-        <input [(ngModel)]="eo.tura" type="number" placeholder="Tura" class="input-field" />
-        <input [(ngModel)]="eo.quantity" type="number" placeholder="Količina" class="input-field" />
-        <input [(ngModel)]="eo.klimaDimensions" placeholder="Dimenzije klime" class="input-field" />
-        <input [(ngModel)]="eo.maskDimensions" placeholder="Dimenzije maske" class="input-field" />
-        <input [(ngModel)]="eo.maskModel" placeholder="Model maske" class="input-field" />
-        <input [(ngModel)]="eo.city" placeholder="Grad" class="input-field" />
-        <input [(ngModel)]="eo.address" placeholder="Adresa" class="input-field" />
-        <input [(ngModel)]="eo.phone" placeholder="Telefon" class="input-field" />
-        <select [(ngModel)]="eo.treatment" class="input-field">
-          <option value="plastifikacija">Plastifikacija</option>
-          <option value="farbanje">Farbanje</option>
-        </select>
-        <input [(ngModel)]="eo.shade" placeholder="Boja / ton" class="input-field" />
-        <input [(ngModel)]="eo.price" type="number" placeholder="Cena (RSD)" class="input-field" />
-        <input [(ngModel)]="eo.profit" type="number" placeholder="Profit (RSD)" class="input-field" />
-      </div>
-
-      <textarea [(ngModel)]="eo.comment" placeholder="Komentar"
-        class="input-field min-h-[100px] w-full"></textarea>
-
-      <!-- Crtež u edit formi -->
-      <div class="space-y-2">
-        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">📐 Crtež</label>
-        <div class="flex items-center gap-3 flex-wrap">
-          <input type="file" accept="image/*" (change)="onImageSelected($event, 'edit')"
-            class="block text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300" />
-          <span class="text-sm text-gray-400 dark:text-gray-500 italic">ili Ctrl+V za nalepljivanje</span>
-        </div>
-        <div *ngIf="eo.imageBase64" class="relative inline-block">
-          <img [src]="eo.imageBase64" class="max-h-48 rounded-lg border border-gray-300 dark:border-gray-600 shadow" />
-          <button type="button" (click)="removeImage('edit')"
-            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-red-600">✕</button>
-        </div>
-        <p *ngIf="!eo.imageBase64" class="text-sm text-gray-400 italic">Nije dodata slika</p>
-      </div>
-
-      <div class="flex justify-end gap-3">
-        <button (click)="saveEdit()"
-          class="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-2xl shadow transition">
-          💾 Sačuvaj
-        </button>
-        <button (click)="cancelEdit()"
-          class="bg-red-500 hover:bg-red-600 text-white font-semibold px-5 py-2 rounded-2xl shadow transition">
-          ✖ Odustani
-        </button>
       </div>
     </div>
 
   </div>
-    </div><!-- end group.orders -->
-  </div><!-- end group -->
-</div>
 
+  <!-- ── Lista porudžbina ── -->
+  <div *ngIf="orders.length > 0; else noOrders" class="space-y-6">
+    <div *ngFor="let group of groupedOrders; trackBy: trackByGroupKey">
+
+      <!-- Group header -->
+      <div *ngIf="groupBy !== 'none'"
+        class="sticky top-0 z-10 flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl shadow font-semibold text-sm">
+        <span>{{ groupBy === 'city' ? '📍' : '🎨' }}</span>
+        <span>{{ group.key }}</span>
+        <span class="ml-auto bg-indigo-500/60 px-2 py-0.5 rounded-full text-xs font-normal">{{ group.orders.length }}</span>
+      </div>
+
+      <div class="space-y-4">
+        <div *ngFor="let o of group.orders; trackBy: trackByOrderId"
+          class="card overflow-hidden hover:shadow-md transition-shadow duration-200">
+
+          <!-- Card header -->
+          <div class="flex items-center justify-between px-5 py-3 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-slate-100">{{ o.firstName }} {{ o.lastName }}</h3>
+              <div class="flex gap-2 mt-0.5">
+                <span *ngIf="o.tura" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full font-medium">Tura {{ o.tura }}</span>
+                <span *ngIf="o.city" class="text-xs bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">📍 {{ o.city }}</span>
+                <span *ngIf="o.shade" class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full">🎨 {{ o.shade }}</span>
+              </div>
+            </div>
+            <div *ngIf="editingOrder?._id !== o._id" class="flex gap-2">
+              <button (click)="editOrder(o)"
+                class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 transition">
+                ✏️ Izmeni
+              </button>
+              <button (click)="deleteOrder(o._id)"
+                class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/70 transition">
+                🗑 Obriši
+              </button>
+            </div>
+          </div>
+
+          <!-- View mode -->
+          <div *ngIf="editingOrder?._id !== o._id" class="px-5 py-4 space-y-4">
+
+            <!-- Fields grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-0">
+              <div class="field-row"><span class="field-label">Kontakt mesto</span><span class="field-value">{{ o.contactPlace || '—' }}</span></div>
+              <div class="field-row"><span class="field-label">Telefon</span><span class="field-value">{{ o.phone || '—' }}</span></div>
+              <div class="field-row"><span class="field-label">Adresa</span><span class="field-value">{{ o.address || '—' }}</span></div>
+              <div class="field-row"><span class="field-label">Količina</span><span class="field-value">{{ o.quantity || '—' }}</span></div>
+              <div class="field-row"><span class="field-label">Dim. klime</span><span class="field-value">{{ o.klimaDimensions || '—' }}</span></div>
+              <div class="field-row"><span class="field-label">Dim. maske</span><span class="field-value">{{ o.maskDimensions || '—' }}</span></div>
+              <div class="field-row"><span class="field-label">Model maske</span><span class="field-value">{{ o.maskModel || '—' }}</span></div>
+              <div class="field-row"><span class="field-label">Zaštita</span><span class="field-value">{{ o.treatment || '—' }}</span></div>
+              <div class="field-row sm:col-span-2"><span class="field-label">Komentar</span><span class="field-value">{{ o.comment || '—' }}</span></div>
+            </div>
+
+            <!-- Cena / Profit -->
+            <div class="flex gap-4 pt-1">
+              <div class="flex-1 bg-slate-50 dark:bg-slate-900/50 rounded-xl px-4 py-2.5 text-center border border-slate-200 dark:border-slate-700">
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">Cena</p>
+                <p class="font-bold text-slate-800 dark:text-slate-200">{{ o.price ? (o.price | number) + ' RSD' : '—' }}</p>
+              </div>
+              <div class="flex-1 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl px-4 py-2.5 text-center border border-emerald-200 dark:border-emerald-800">
+                <p class="text-xs text-emerald-600 dark:text-emerald-400 mb-0.5">Profit</p>
+                <p class="font-bold text-emerald-700 dark:text-emerald-300">{{ o.profit ? (o.profit | number) + ' RSD' : '—' }}</p>
+              </div>
+            </div>
+
+            <!-- Crtež -->
+            <div>
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">📐 Crtež</p>
+              <img *ngIf="o.imageBase64" [src]="o.imageBase64"
+                class="max-w-full rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm" />
+              <p *ngIf="!o.imageBase64" class="text-sm text-slate-400 italic">Nije dodata slika</p>
+            </div>
+
+            <p class="text-xs text-slate-400 dark:text-slate-500 text-right">Kreirano: {{ o.createdAt | date:'short' }}</p>
+          </div>
+
+          <!-- Edit mode -->
+          <div *ngIf="editingOrder && editingOrder._id === o._id" class="px-5 py-4 space-y-4">
+            <p class="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Izmena: {{ eo.firstName }} {{ eo.lastName }}</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input [(ngModel)]="eo.firstName" placeholder="Ime" class="input-field" />
+              <input [(ngModel)]="eo.lastName" placeholder="Prezime" class="input-field" />
+              <input [(ngModel)]="eo.contactPlace" placeholder="Kontakt mesto" class="input-field" />
+              <input [(ngModel)]="eo.tura" type="number" placeholder="Tura" class="input-field" />
+              <input [(ngModel)]="eo.quantity" type="number" placeholder="Količina" class="input-field" />
+              <input [(ngModel)]="eo.klimaDimensions" placeholder="Dimenzije klime" class="input-field" />
+              <input [(ngModel)]="eo.maskDimensions" placeholder="Dimenzije maske" class="input-field" />
+              <input [(ngModel)]="eo.maskModel" placeholder="Model maske" class="input-field" />
+              <input [(ngModel)]="eo.city" placeholder="Grad" class="input-field" />
+              <input [(ngModel)]="eo.address" placeholder="Adresa" class="input-field" />
+              <input [(ngModel)]="eo.phone" placeholder="Telefon" class="input-field" />
+              <select [(ngModel)]="eo.treatment" class="input-field">
+                <option value="plastifikacija">Plastifikacija</option>
+                <option value="farbanje">Farbanje</option>
+              </select>
+              <input [(ngModel)]="eo.shade" placeholder="Boja / ton" class="input-field" />
+              <input [(ngModel)]="eo.price" type="number" placeholder="Cena (RSD)" class="input-field" />
+              <input [(ngModel)]="eo.profit" type="number" placeholder="Profit (RSD)" class="input-field" />
+            </div>
+
+            <textarea [(ngModel)]="eo.comment" placeholder="Komentar" class="input-field min-h-[80px]"></textarea>
+
+            <div class="space-y-2">
+              <p class="text-sm font-medium text-slate-600 dark:text-slate-400">📐 Crtež</p>
+              <div class="flex items-center gap-3 flex-wrap">
+                <input type="file" accept="image/*" (change)="onImageSelected($event, 'edit')"
+                  class="text-sm text-slate-500 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-300 transition" />
+                <span class="text-xs text-slate-400 italic">ili Ctrl+V</span>
+              </div>
+              <div *ngIf="eo.imageBase64" class="relative inline-block">
+                <img [src]="eo.imageBase64" class="max-h-48 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm" />
+                <button type="button" (click)="removeImage('edit')"
+                  class="absolute top-1 right-1 bg-rose-500 text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-rose-600 leading-none">✕</button>
+              </div>
+              <p *ngIf="!eo.imageBase64" class="text-xs text-slate-400 italic">Nije dodata slika</p>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1">
+              <button (click)="saveEdit()" class="btn-success text-sm">💾 Sačuvaj</button>
+              <button (click)="cancelEdit()" class="btn-danger text-sm">✖ Odustani</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
 
   <ng-template #noOrders>
-    <div class="text-center text-gray-500 dark:text-gray-400 italic mt-10">
-      Trenutno nema porudžbina.
+    <div class="card p-12 text-center">
+      <p class="text-slate-400 dark:text-slate-500 italic">Trenutno nema porudžbina.</p>
     </div>
   </ng-template>
 
-
+</div>
 </div>
