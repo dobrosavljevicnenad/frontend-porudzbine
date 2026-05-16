@@ -90,8 +90,11 @@
     <!-- Crtež -->
     <div class="space-y-2">
       <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">📐 Crtež</label>
-      <input type="file" accept="image/*" (change)="onImageSelected($event, 'new')"
-        class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300" />
+      <div class="flex items-center gap-3 flex-wrap">
+        <input type="file" accept="image/*" (change)="onImageSelected($event, 'new')"
+          class="block text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300" />
+        <span class="text-sm text-gray-400 dark:text-gray-500 italic">ili Ctrl+V za nalepljivanje</span>
+      </div>
       <div *ngIf="newOrder.imageBase64" class="relative inline-block">
         <img [src]="newOrder.imageBase64" class="max-h-48 rounded-lg border border-gray-300 dark:border-gray-600 shadow" />
         <button type="button" (click)="removeImage('new')"
@@ -260,8 +263,11 @@
       <!-- Crtež u edit formi -->
       <div class="space-y-2">
         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">📐 Crtež</label>
-        <input type="file" accept="image/*" (change)="onImageSelected($event, 'edit')"
-          class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300" />
+        <div class="flex items-center gap-3 flex-wrap">
+          <input type="file" accept="image/*" (change)="onImageSelected($event, 'edit')"
+            class="block text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300" />
+          <span class="text-sm text-gray-400 dark:text-gray-500 italic">ili Ctrl+V za nalepljivanje</span>
+        </div>
         <div *ngIf="eo.imageBase64" class="relative inline-block">
           <img [src]="eo.imageBase64" class="max-h-48 rounded-lg border border-gray-300 dark:border-gray-600 shadow" />
           <button type="button" (click)="removeImage('edit')"

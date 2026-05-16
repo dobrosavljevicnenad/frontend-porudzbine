@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { OrderService, Order } from '../../services/order.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -208,6 +208,29 @@ export class OrdersComponent implements OnInit {
   }
 
   get eo(): Order { return this.editingOrder!; }
+
+  @HostListener('window:paste', ['$event'])
+  onGlobalPaste(event: ClipboardEvent) {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (this.editingOrder) {
+            this.editingOrder.imageBase64 = reader.result as string;
+          } else {
+            this.newOrder.imageBase64 = reader.result as string;
+          }
+        };
+        reader.readAsDataURL(file);
+        event.preventDefault();
+        break;
+      }
+    }
+  }
 
   onImageSelected(event: Event, target: 'new' | 'edit') {
     const file = (event.target as HTMLInputElement).files?.[0];
