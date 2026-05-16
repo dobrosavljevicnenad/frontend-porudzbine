@@ -87,6 +87,18 @@
     <textarea [(ngModel)]="newOrder.comment" name="comment" placeholder="Komentar"
       class="input-field min-h-[100px] sm:col-span-2"></textarea>
 
+    <!-- Crtež -->
+    <div class="space-y-2">
+      <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">📐 Crtež</label>
+      <input type="file" accept="image/*" (change)="onImageSelected($event, 'new')"
+        class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300" />
+      <div *ngIf="newOrder.imageBase64" class="relative inline-block">
+        <img [src]="newOrder.imageBase64" class="max-h-48 rounded-lg border border-gray-300 dark:border-gray-600 shadow" />
+        <button type="button" (click)="removeImage('new')"
+          class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-red-600">✕</button>
+      </div>
+    </div>
+
     <div class="flex justify-end">
       <button type="submit"
         class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition">
@@ -200,6 +212,15 @@
       <div><span class="font-semibold">💰 Cena:</span> {{ o.price ? (o.price + ' RSD') : '-' }}</div>
       <div><span class="font-semibold">📈 Profit:</span> {{ o.profit ? (o.profit + ' RSD') : '-' }}</div>
       <div><span class="font-semibold">📝 Komentar:</span> {{ o.comment || '-' }}</div>
+      <div class="mt-2">
+        <span class="font-semibold text-sm">📐 Crtež:</span>
+        <div *ngIf="o.imageBase64; else noImage" class="mt-1">
+          <img [src]="o.imageBase64" class="max-w-full rounded-lg border border-gray-300 dark:border-gray-600 shadow" />
+        </div>
+        <ng-template #noImage>
+          <span class="text-gray-400 italic text-sm ml-1">Nije dodata slika</span>
+        </ng-template>
+      </div>
       <div class="text-right text-gray-400 text-xs">⏰ Kreirano: {{ o.createdAt | date:'short' }}</div>
     </div>
 
@@ -235,6 +256,19 @@
 
       <textarea [(ngModel)]="eo.comment" placeholder="Komentar"
         class="input-field min-h-[100px] w-full"></textarea>
+
+      <!-- Crtež u edit formi -->
+      <div class="space-y-2">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-200">📐 Crtež</label>
+        <input type="file" accept="image/*" (change)="onImageSelected($event, 'edit')"
+          class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/40 dark:file:text-blue-300" />
+        <div *ngIf="eo.imageBase64" class="relative inline-block">
+          <img [src]="eo.imageBase64" class="max-h-48 rounded-lg border border-gray-300 dark:border-gray-600 shadow" />
+          <button type="button" (click)="removeImage('edit')"
+            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-red-600">✕</button>
+        </div>
+        <p *ngIf="!eo.imageBase64" class="text-sm text-gray-400 italic">Nije dodata slika</p>
+      </div>
 
       <div class="flex justify-end gap-3">
         <button (click)="saveEdit()"

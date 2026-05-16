@@ -209,6 +209,28 @@ export class OrdersComponent implements OnInit {
 
   get eo(): Order { return this.editingOrder!; }
 
+  onImageSelected(event: Event, target: 'new' | 'edit') {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (target === 'new') {
+        this.newOrder.imageBase64 = reader.result as string;
+      } else if (this.editingOrder) {
+        this.editingOrder.imageBase64 = reader.result as string;
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(target: 'new' | 'edit') {
+    if (target === 'new') {
+      this.newOrder.imageBase64 = undefined;
+    } else if (this.editingOrder) {
+      this.editingOrder.imageBase64 = undefined;
+    }
+  }
+
   trackByGroupKey(_: number, group: { key: string; orders: Order[] }): string {
     return group.key;
   }

@@ -20,6 +20,7 @@ export interface Order {
   price?: number;
   profit?: number;
   comment?: string;
+  imageBase64?: string;
   createdAt?: string;
 }
 
