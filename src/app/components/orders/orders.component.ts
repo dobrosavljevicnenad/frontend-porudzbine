@@ -30,12 +30,20 @@ export class OrdersComponent implements OnInit {
     PLASTIFICIRANO: 'Plastificirano',
     ISPORUCENO: 'Isporučeno'
   };
-  readonly STATUS_BADGE_CLASSES: Record<OrderStatus, string> = {
-    PORUCENO: 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200',
-    ISECENO: 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300',
-    PLASTIFICIRANO: 'bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300',
-    ISPORUCENO: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300'
+  readonly STATUS_ACCENT: Record<OrderStatus, string> = {
+    PORUCENO: 'accent-graphite',
+    ISECENO: 'accent-blade',
+    PLASTIFICIRANO: 'accent-resin',
+    ISPORUCENO: 'accent-rust'
   };
+
+  statusIndex(status?: OrderStatus): number {
+    return this.STATUSES.indexOf(status || 'PORUCENO');
+  }
+
+  ticketCode(order: Order): string {
+    return (order._id || '').slice(-4).toUpperCase();
+  }
 
   totalBoards = 0;
   editingBoards = false;
@@ -71,8 +79,6 @@ Komentar: /`;
       setTimeout(() => this.sablonKopiran = false, 2000);
     });
   }
-
-  isDarkMode = false;
 
   pasteText = '';
 
@@ -182,28 +188,9 @@ Komentar: /`;
       });
   }
 
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-    const body = document.body;
-
-    if (this.isDarkMode) {
-      body.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      body.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }
-
   constructor(private orderService: OrderService) {}
 
   ngOnInit() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      this.isDarkMode = true;
-      document.body.classList.add('dark');
-    }
-
     this.loadOrders();
     this.loadStock();
     this.loadMonthlyDeliveries();

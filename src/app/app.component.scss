@@ -1,0 +1,21 @@
+.nav-link {
+  @apply font-sans text-sm font-medium text-steel/55 px-3 py-2 rounded-md
+         whitespace-nowrap transition-colors hover:text-steel hover:bg-steel/5;
+
+  &.is-active {
+    @apply text-steel bg-steel/10;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.theme-toggle {
+  @apply w-9 h-9 rounded-md flex items-center justify-center
+         text-steel/60 hover:text-steel hover:bg-steel/10 transition-colors;
+
+  svg {
+    @apply w-[18px] h-[18px];
+  }
+}

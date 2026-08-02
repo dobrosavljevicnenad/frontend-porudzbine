@@ -2,12 +2,11 @@ import { Component, computed } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InvestmentService, Investment, Withdrawal } from '../../services/investment.service'
-import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-uplate-investitora',
   standalone: true,
-  imports: [FormsModule, CommonModule, DecimalPipe, RouterLink],
+  imports: [FormsModule, CommonModule, DecimalPipe],
   templateUrl: './uplate-investitora.component.html',
   styleUrl: './uplate-investitora.component.scss'
 })

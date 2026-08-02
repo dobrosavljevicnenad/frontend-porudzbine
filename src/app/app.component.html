@@ -1,1 +1,33 @@
-<router-outlet></router-outlet>
+<div class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-30 bg-charcoal border-b-2 border-rust/70">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+
+      <a routerLink="/" class="flex items-center gap-2.5 shrink-0 group">
+        <span class="w-2.5 h-6 bg-rust rounded-[2px] group-hover:bg-rust-light transition-colors"></span>
+        <span class="font-stencil text-2xl text-steel leading-none tracking-wide">MASKE</span>
+        <span class="hidden sm:inline font-mono text-[11px] uppercase tracking-[0.18em] text-steel/40 mt-0.5">radionica</span>
+      </a>
+
+      <nav class="flex items-center gap-1 overflow-x-auto no-scrollbar">
+        <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{exact:true}" class="nav-link">Porudžbine</a>
+        <a routerLink="/sales_techniques" routerLinkActive="is-active" class="nav-link">Tehnike prodaje</a>
+        <a routerLink="/investor_payments" routerLinkActive="is-active" class="nav-link">Uplate investitora</a>
+      </nav>
+
+      <button type="button" (click)="toggleDarkMode()" class="theme-toggle shrink-0"
+        [attr.aria-label]="isDarkMode ? 'Uključi svetlu temu' : 'Uključi tamnu temu'">
+        <svg *ngIf="!isDarkMode" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" />
+        </svg>
+        <svg *ngIf="isDarkMode" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4.2" />
+          <path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1">
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,185 +1,127 @@
-<div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg text-gray-900 dark:text-gray-100">
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold flex items-center gap-2">
-      💰 Uplate investitora
-    </h2>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
 
-    <a
-      routerLink="/orders"
-      class="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100
-             px-4 py-2 rounded-xl shadow hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
-    >
-      ⬅ <span class="font-medium">Nazad na porudžbine</span>
-    </a>
+  <div class="pt-1">
+    <p class="eyebrow">Radionica · Knjiga uplata</p>
+    <h1 class="font-display text-3xl sm:text-4xl font-bold mt-1">Uplate investitora</h1>
   </div>
 
-  <!-- 📥 Forma za uplatu -->
-  <form (ngSubmit)="addInvestment()" class="grid sm:grid-cols-4 gap-4 mb-6">
-    <input
-      [(ngModel)]="newInvestment.company"
-      name="company"
-      type="text"
-      placeholder="Firma"
-      required
-      class="px-3 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-gray-50 w-full"
-    />
-    <input
-      [(ngModel)]="newInvestment.date"
-      name="date"
-      type="date"
-      class="px-3 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-gray-50 w-full"
-    />
-    <input
-      [(ngModel)]="newInvestment.full_amount"
-      name="full_amount"
-      type="number"
-      placeholder="Iznos (din)"
-      required
-      class="px-3 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-gray-50 w-full"
-    />
-    <button
-      type="submit"
-      class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
-    >
-      ➕ Dodaj uplatu
-    </button>
-  </form>
+  <!-- 📥 Forme -->
+  <div class="grid sm:grid-cols-2 gap-4">
+    <div class="card border-l-[3px] border-l-resin p-5 space-y-3">
+      <p class="eyebrow">Uplata</p>
+      <form (ngSubmit)="addInvestment()" class="space-y-3">
+        <input [(ngModel)]="newInvestment.company" name="company" type="text" placeholder="Firma" required class="input-field" />
+        <input [(ngModel)]="newInvestment.date" name="date" type="date" class="input-field" />
+        <input [(ngModel)]="newInvestment.full_amount" name="full_amount" type="number" placeholder="Iznos (din)" required class="input-field font-mono" />
+        <button type="submit" class="btn-success w-full">Dodaj uplatu</button>
+      </form>
+    </div>
 
-  <!-- 💸 Forma za isplatu -->
-  <form (ngSubmit)="addWithdrawal()" class="grid sm:grid-cols-4 gap-4 mb-8">
-    <select
-      [(ngModel)]="newWithdrawal.company"
-      name="wCompany"
-      required
-      class="px-3 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-gray-50 w-full"
-    >
-      <option value="" disabled selected>Izaberite firmu</option>
-      <option *ngFor="let c of companies" [value]="c">{{ c }}</option>
-    </select>
-
-    <input
-      [(ngModel)]="newWithdrawal.date"
-      name="wDate"
-      type="date"
-      class="px-3 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-gray-50 w-full"
-    />
-
-    <input
-      [(ngModel)]="newWithdrawal.amount"
-      name="wAmount"
-      type="number"
-      placeholder="Iznos (din)"
-      required
-      class="px-3 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 dark:text-gray-50 w-full"
-    />
-
-    <button
-      type="submit"
-      class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
-    >
-      ➖ Dodaj isplatu
-    </button>
-  </form>
-
-  <!-- 📋 Istorija uplata -->
-  <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">📋 Istorija uplata</h3>
-  <table class="w-full text-left border-collapse mb-6">
-    <thead>
-      <tr class="border-b dark:border-gray-600">
-        <th class="p-2">Firma</th>
-        <th class="p-2">Datum</th>
-        <th class="p-2">Ukupno</th>
-        <th class="p-2">Preostalo</th>
-        <th class="p-2 text-right">Akcije</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        *ngFor="let inv of remainingAmounts()"
-        class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition"
-      >
-        <td class="p-2">{{ inv.company }}</td>
-        <td class="p-2">{{ inv.date }}</td>
-        <td class="p-2">{{ inv.full_amount | number }} din</td>
-        <td class="p-2 text-green-600">{{ inv.remaining_amount | number }} din</td>
-        <td class="p-2 text-right">
-          <button
-            type="button"
-            (click)="deleteInvestment(inv)"
-            class="text-sm px-3 py-1 rounded-lg bg-red-100 text-red-700 hover:bg-red-200
-                   dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-900 transition"
-          >
-            🗑 Obriši
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- 💵 Isplate -->
-  <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">💵 Isplate</h3>
-  <table class="w-full text-left border-collapse mb-6">
-    <thead>
-      <tr class="border-b dark:border-gray-600">
-        <th class="p-2">Firma</th>
-        <th class="p-2">Datum</th>
-        <th class="p-2">Iznos</th>
-        <th class="p-2 text-right">Akcije</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        *ngFor="let wd of investmentService.withdrawals()"
-        class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/60 transition"
-      >
-        <td class="p-2">{{ wd.company }}</td>
-        <td class="p-2">{{ wd.date }}</td>
-        <td class="p-2 text-red-500">-{{ wd.amount | number }} din</td>
-        <td class="p-2 text-right">
-          <button
-            type="button"
-            (click)="deleteWithdrawal(wd)"
-            class="text-sm px-3 py-1 rounded-lg bg-red-100 text-red-700 hover:bg-red-200
-                   dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-900 transition"
-          >
-            🗑 Obriši
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="card border-l-[3px] border-l-rust p-5 space-y-3">
+      <p class="eyebrow">Isplata</p>
+      <form (ngSubmit)="addWithdrawal()" class="space-y-3">
+        <select [(ngModel)]="newWithdrawal.company" name="wCompany" required class="input-field">
+          <option value="" disabled selected>Izaberite firmu</option>
+          <option *ngFor="let c of companies" [value]="c">{{ c }}</option>
+        </select>
+        <input [(ngModel)]="newWithdrawal.date" name="wDate" type="date" class="input-field" />
+        <input [(ngModel)]="newWithdrawal.amount" name="wAmount" type="number" placeholder="Iznos (din)" required class="input-field font-mono" />
+        <button type="submit" class="w-full bg-rust hover:bg-rust-dark text-white font-semibold px-5 py-2 rounded-md shadow-tag transition">Dodaj isplatu</button>
+      </form>
+    </div>
+  </div>
 
   <!-- 📊 Ukupni podaci -->
-  <div class="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-lg font-medium dark:text-gray-50">
-    💰 Ukupno uplaćeno: <b>{{ totalInvested() | number }}</b> din <br />
-    💸 Ukupno podignuto: <b>{{ totalWithdrawn() | number }}</b> din <br />
-    ✅ Preostalo: <b>{{ totalRemaining() | number }}</b> din
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="stat-tile accent-resin">
+      <p class="eyebrow">Ukupno uplaćeno</p>
+      <p class="font-mono text-2xl font-semibold mt-1.5">{{ totalInvested() | number }} <span class="text-sm text-charcoal/40 dark:text-steel/35">din</span></p>
+    </div>
+    <div class="stat-tile accent-rust">
+      <p class="eyebrow">Ukupno podignuto</p>
+      <p class="font-mono text-2xl font-semibold mt-1.5">{{ totalWithdrawn() | number }} <span class="text-sm text-charcoal/40 dark:text-steel/35">din</span></p>
+    </div>
+    <div class="stat-tile accent-blade">
+      <p class="eyebrow">Preostalo</p>
+      <p class="font-mono text-2xl font-semibold mt-1.5">{{ totalRemaining() | number }} <span class="text-sm text-charcoal/40 dark:text-steel/35">din</span></p>
+    </div>
+  </div>
+
+  <!-- 📋 Istorija uplata -->
+  <div class="card p-5 space-y-3">
+    <p class="eyebrow">Knjiga · Uplate</p>
+    <h2 class="font-display text-lg font-semibold -mt-1.5">Istorija uplata</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-sm">
+        <thead>
+          <tr class="border-b border-charcoal/10 dark:border-steel/10">
+            <th class="p-2 font-mono text-[11px] uppercase tracking-wide text-charcoal/40 dark:text-steel/35">Firma</th>
+            <th class="p-2 font-mono text-[11px] uppercase tracking-wide text-charcoal/40 dark:text-steel/35">Datum</th>
+            <th class="p-2 font-mono text-[11px] uppercase tracking-wide text-charcoal/40 dark:text-steel/35">Ukupno</th>
+            <th class="p-2 font-mono text-[11px] uppercase tracking-wide text-charcoal/40 dark:text-steel/35">Preostalo</th>
+            <th class="p-2 text-right font-mono text-[11px] uppercase tracking-wide text-charcoal/40 dark:text-steel/35">Akcije</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let inv of remainingAmounts()"
+            class="border-b border-charcoal/8 dark:border-steel/8 hover:bg-charcoal/[0.02] dark:hover:bg-steel/[0.03] transition">
+            <td class="p-2">{{ inv.company }}</td>
+            <td class="p-2 font-mono text-charcoal/60 dark:text-steel/55">{{ inv.date }}</td>
+            <td class="p-2 font-mono">{{ inv.full_amount | number }} din</td>
+            <td class="p-2 font-mono text-resin dark:text-resin-light">{{ inv.remaining_amount | number }} din</td>
+            <td class="p-2 text-right">
+              <button type="button" (click)="deleteInvestment(inv)"
+                class="text-xs px-3 py-1 rounded-md text-rust-dark dark:text-rust-light hover:bg-rust/10 transition">
+                Obriši
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 💵 Isplate -->
+  <div class="card p-5 space-y-3">
+    <p class="eyebrow">Knjiga · Isplate</p>
+    <h2 class="font-display text-lg font-semibold -mt-1.5">Istorija isplata</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-sm">
+        <thead>
+          <tr class="border-b border-charcoal/10 dark:border-steel/10">
+            <th class="p-2 font-mono text-[11px] uppercase tracking-wide text-charcoal/40 dark:text-steel/35">Firma</th>
+            <th class="p-2 font-mono text-[11px] uppercase tracking-wide text-charcoal/40 dark:text-steel/35">Datum</th>
+            <th class="p-2 font-mono text-[11px] uppercase tracking-wide text-charcoal/40 dark:text-steel/35">Iznos</th>
+            <th class="p-2 text-right font-mono text-[11px] uppercase tracking-wide text-charcoal/40 dark:text-steel/35">Akcije</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let wd of investmentService.withdrawals()"
+            class="border-b border-charcoal/8 dark:border-steel/8 hover:bg-charcoal/[0.02] dark:hover:bg-steel/[0.03] transition">
+            <td class="p-2">{{ wd.company }}</td>
+            <td class="p-2 font-mono text-charcoal/60 dark:text-steel/55">{{ wd.date }}</td>
+            <td class="p-2 font-mono text-rust-dark dark:text-rust-light">-{{ wd.amount | number }} din</td>
+            <td class="p-2 text-right">
+              <button type="button" (click)="deleteWithdrawal(wd)"
+                class="text-xs px-3 py-1 rounded-md text-rust-dark dark:text-rust-light hover:bg-rust/10 transition">
+                Obriši
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- 🏢 Istorija firmi -->
-  <div class="mt-10 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-    <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100 flex items-center gap-2">
-      🏢 Istorija firmi
-    </h3>
-
-    <div
-      class="flex flex-wrap gap-3"
-      *ngIf="investmentService.companies()"
-    >
-      <span
-        *ngFor="let c of investmentService.companies()"
-        class="bg-gray-100 dark:bg-gray-700/80 text-gray-900 dark:text-gray-100
-              px-3 py-1.5 rounded-full text-sm font-medium shadow-sm
-              border border-gray-200/70 dark:border-gray-600
-              hover:bg-gray-200 dark:hover:bg-gray-600
-              transition-colors duration-200 cursor-default"
-      >
+  <div class="card p-5 space-y-3">
+    <p class="eyebrow">Registar</p>
+    <h2 class="font-display text-lg font-semibold -mt-1.5">Istorija firmi</h2>
+    <div class="flex flex-wrap gap-2" *ngIf="investmentService.companies()">
+      <span *ngFor="let c of investmentService.companies()" class="chip !text-sm !py-1.5">
         {{ c.name }}
       </span>
     </div>
   </div>
+
 </div>
-
-
-
-

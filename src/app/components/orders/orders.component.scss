@@ -1,0 +1,66 @@
+/* ── Route tracker: signature status control ── */
+.route-tracker {
+  @apply flex items-start w-full;
+}
+
+.route-node {
+  @apply flex flex-col items-center gap-1.5 flex-1 min-w-0 bg-transparent border-0 p-1 cursor-pointer;
+
+  &:focus-visible {
+    outline: 2px solid theme('colors.rust.DEFAULT');
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+.route-dot {
+  @apply block w-3 h-3 rounded-full border-2 border-charcoal/20 dark:border-steel/25
+         bg-white dark:bg-charcoal transition-all duration-200;
+}
+
+.route-node:hover .route-dot {
+  @apply border-charcoal/40 dark:border-steel/45;
+}
+
+.route-label {
+  @apply font-mono text-[10px] uppercase tracking-[0.06em] text-charcoal/40 dark:text-steel/35
+         text-center leading-tight transition-colors duration-200;
+}
+
+.route-rail {
+  @apply h-[2px] flex-1 bg-charcoal/10 dark:bg-steel/12 mt-[8px] mx-0.5 transition-colors duration-300;
+
+  &.is-filled {
+    @apply bg-rust/70;
+  }
+}
+
+.route-node.is-current .route-dot {
+  @apply border-transparent scale-[1.3];
+  box-shadow: 0 0 0 3px rgba(190, 91, 57, 0.22);
+}
+
+.route-node.is-current .route-label,
+.route-node.is-done .route-label {
+  @apply text-charcoal dark:text-steel font-semibold;
+}
+
+.route-node.accent-graphite.is-done .route-dot,
+.route-node.accent-graphite.is-current .route-dot {
+  @apply bg-charcoal/70 dark:bg-steel/70 border-transparent;
+}
+
+.route-node.accent-blade.is-done .route-dot,
+.route-node.accent-blade.is-current .route-dot {
+  @apply bg-blade dark:bg-blade-light border-transparent;
+}
+
+.route-node.accent-resin.is-done .route-dot,
+.route-node.accent-resin.is-current .route-dot {
+  @apply bg-resin dark:bg-resin-light border-transparent;
+}
+
+.route-node.accent-rust.is-done .route-dot,
+.route-node.accent-rust.is-current .route-dot {
+  @apply bg-rust dark:bg-rust-light border-transparent;
+}
