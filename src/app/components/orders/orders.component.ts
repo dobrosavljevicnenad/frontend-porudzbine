@@ -1,8 +1,12 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { OrderService, Order } from '../../services/order.service';
+import { OrderService, Order, OrderStatus, OrderDeliveredResponse } from '../../services/order.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+
+function isDeliveredResponse(value: any): value is OrderDeliveredResponse {
+  return !!value && value.delivered === true;
+}
 
 @Component({
   selector: 'app-orders',
@@ -16,15 +20,30 @@ export class OrdersComponent implements OnInit {
   editingOrder: Order | null = null;
   newOrder: Partial<Order> = { treatment: 'plastifikacija' };
   filterTura: number | null = null;
+  filterStatus: OrderStatus | null = null;
   groupBy: 'none' | 'city' | 'shade' = 'none';
+
+  readonly STATUSES: OrderStatus[] = ['PORUCENO', 'ISECENO', 'PLASTIFICIRANO', 'ISPORUCENO'];
+  readonly STATUS_LABELS: Record<OrderStatus, string> = {
+    PORUCENO: 'Poručeno',
+    ISECENO: 'Isečeno',
+    PLASTIFICIRANO: 'Plastificirano',
+    ISPORUCENO: 'Isporučeno'
+  };
+  readonly STATUS_BADGE_CLASSES: Record<OrderStatus, string> = {
+    PORUCENO: 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200',
+    ISECENO: 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300',
+    PLASTIFICIRANO: 'bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300',
+    ISPORUCENO: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300'
+  };
 
   totalBoards = 0;
   editingBoards = false;
   newBoardsValue: number = 0;
 
-  monthlyProfits: { month: string; profit: number }[] = [];
-  editingProfitMonth: string | null = null;
-  editingProfitValue: number = 0;
+  monthlyDeliveries: { month: string; count: number }[] = [];
+  editingDeliveryMonth: string | null = null;
+  editingDeliveryValue: number = 0;
 
   sablonVisible = false;
   readonly sablonText =
@@ -121,22 +140,13 @@ Komentar: /`;
   private readonly MONTHS = ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'];
 
   get monthlyStats() {
-    const boardsMap = new Map<string, number>();
-    for (const order of this.orders) {
-      if (!order.createdAt) continue;
-      const d = new Date(order.createdAt);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      boardsMap.set(key, (boardsMap.get(key) || 0) + (order.quantity || 0));
-    }
-
     const now = new Date();
     const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
     const allMonths = new Set<string>([currentMonth]);
-    for (const [k] of boardsMap) allMonths.add(k);
-    for (const p of this.monthlyProfits) allMonths.add(p.month);
+    for (const d of this.monthlyDeliveries) allMonths.add(d.month);
 
-    const profitMap = new Map(this.monthlyProfits.map(p => [p.month, p.profit]));
+    const countMap = new Map(this.monthlyDeliveries.map(d => [d.month, d.count]));
 
     return Array.from(allMonths)
       .sort((a, b) => b.localeCompare(a))
@@ -147,29 +157,28 @@ Komentar: /`;
           label: month === currentMonth
             ? `Trenutni mesec (${this.MONTHS[mon - 1]})`
             : this.MONTHS[mon - 1],
-          profit: profitMap.get(month) || 0,
-          boards: boardsMap.get(month) || 0,
+          count: countMap.get(month) || 0,
           isCurrent: month === currentMonth
         };
       });
   }
 
-  startEditProfit(month: string, profit: number) {
-    this.editingProfitMonth = month;
-    this.editingProfitValue = profit;
+  startEditDelivery(month: string, count: number) {
+    this.editingDeliveryMonth = month;
+    this.editingDeliveryValue = count;
   }
 
-  saveProfit() {
-    if (!this.editingProfitMonth) return;
-    this.orderService.updateMonthlyProfit(this.editingProfitMonth, this.editingProfitValue)
+  saveDelivery() {
+    if (!this.editingDeliveryMonth) return;
+    this.orderService.updateMonthlyDelivery(this.editingDeliveryMonth, this.editingDeliveryValue)
       .subscribe(updated => {
-        const idx = this.monthlyProfits.findIndex(p => p.month === updated.month);
+        const idx = this.monthlyDeliveries.findIndex(d => d.month === updated.month);
         if (idx >= 0) {
-          this.monthlyProfits[idx] = updated;
+          this.monthlyDeliveries[idx] = updated;
         } else {
-          this.monthlyProfits.push(updated);
+          this.monthlyDeliveries.push(updated);
         }
-        this.editingProfitMonth = null;
+        this.editingDeliveryMonth = null;
       });
   }
 
@@ -197,15 +206,15 @@ Komentar: /`;
 
     this.loadOrders();
     this.loadStock();
-    this.loadMonthlyProfits();
+    this.loadMonthlyDeliveries();
   }
 
   loadOrders() {
     this.orderService.getOrders().subscribe(orders => this.orders = orders);
   }
 
-  loadMonthlyProfits() {
-    this.orderService.getMonthlyProfits().subscribe(profits => this.monthlyProfits = profits);
+  loadMonthlyDeliveries() {
+    this.orderService.getMonthlyDeliveries().subscribe(deliveries => this.monthlyDeliveries = deliveries);
   }
 
   loadStock(){
@@ -216,8 +225,10 @@ Komentar: /`;
   }
 
   get filteredOrders(): Order[] {
-    if (this.filterTura === null) return this.orders;
-    return this.orders.filter(o => o.tura === this.filterTura);
+    return this.orders.filter(o =>
+      (this.filterTura === null || o.tura === this.filterTura) &&
+      (this.filterStatus === null || o.status === this.filterStatus)
+    );
   }
 
   get groupedOrders(): { key: string; orders: Order[] }[] {
@@ -255,6 +266,27 @@ Komentar: /`;
     if (!id) return;
     this.orderService.deleteOrder(id).subscribe(() => {
       this.orders = this.orders.filter(o => o._id !== id);
+    });
+  }
+
+  changeStatus(order: Order, status: OrderStatus) {
+    if (!order._id || order.status === status) return;
+
+    if (status === 'ISPORUCENO') {
+      const confirmed = confirm(
+        `Porudžbina za ${order.firstName} ${order.lastName} će biti uklonjena sa liste i dodata u broj isporučenih maski za ovaj mesec. Nastaviti?`
+      );
+      if (!confirmed) return;
+    }
+
+    const id = order._id;
+    this.orderService.updateOrderStatus(id, status).subscribe(response => {
+      if (isDeliveredResponse(response)) {
+        this.orders = this.orders.filter(o => o._id !== id);
+        this.loadMonthlyDeliveries();
+      } else {
+        this.orders = this.orders.map(o => o._id === response._id ? response : o);
+      }
     });
   }
 
@@ -327,8 +359,22 @@ Komentar: /`;
 
   saveEdit() {
     if (!this.editingOrder?._id) return;
-    this.orderService.updateOrder(this.editingOrder._id, this.editingOrder).subscribe(updated => {
-      this.orders = this.orders.map(o => o._id === updated._id ? updated : o);
+
+    if (this.editingOrder.status === 'ISPORUCENO') {
+      const confirmed = confirm(
+        `Porudžbina za ${this.editingOrder.firstName} ${this.editingOrder.lastName} će biti uklonjena sa liste i dodata u broj isporučenih maski za ovaj mesec. Nastaviti?`
+      );
+      if (!confirmed) return;
+    }
+
+    const id = this.editingOrder._id;
+    this.orderService.updateOrder(id, this.editingOrder).subscribe(response => {
+      if (isDeliveredResponse(response)) {
+        this.orders = this.orders.filter(o => o._id !== id);
+        this.loadMonthlyDeliveries();
+      } else {
+        this.orders = this.orders.map(o => o._id === response._id ? response : o);
+      }
       this.editingOrder = null;
     });
   }

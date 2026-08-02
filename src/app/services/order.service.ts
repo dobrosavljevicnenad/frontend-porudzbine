@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export type OrderStatus = 'PORUCENO' | 'ISECENO' | 'PLASTIFICIRANO' | 'ISPORUCENO';
+
 export interface Order {
   _id?: string;
   firstName: string;
@@ -18,10 +20,18 @@ export interface Order {
   treatment?: 'plastifikacija' | 'farbanje';
   shade?: string;
   price?: number;
-  profit?: number;
+  status?: OrderStatus;
   comment?: string;
   imageBase64?: string;
   createdAt?: string;
+}
+
+// Odgovor servera kad porudžbina pređe u ISPORUCENO — porudžbina se briše
+// i njena količina se dodaje u mesečnu statistiku.
+export interface OrderDeliveredResponse {
+  delivered: true;
+  deletedOrderId: string;
+  monthly: { month: string; count: number };
 }
 
 @Injectable({
@@ -43,20 +53,24 @@ export class OrderService {
     return this.http.post<Order>(this.apiUrl, order);
   }
 
-  updateOrder(id: string, data: Partial<Order>): Observable<Order> {
-    return this.http.put<Order>(`${this.apiUrl}/${id}`, data);
+  updateOrder(id: string, data: Partial<Order>): Observable<Order | OrderDeliveredResponse> {
+    return this.http.put<Order | OrderDeliveredResponse>(`${this.apiUrl}/${id}`, data);
+  }
+
+  updateOrderStatus(id: string, status: OrderStatus): Observable<Order | OrderDeliveredResponse> {
+    return this.http.put<Order | OrderDeliveredResponse>(`${this.apiUrl}/${id}`, { status });
   }
 
   updateStock(newValue: number): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/stock`, { availableBoards: newValue });
   }
 
-  getMonthlyProfits(): Observable<{ month: string; profit: number }[]> {
-    return this.http.get<{ month: string; profit: number }[]>(`${this.apiUrl}/monthly-profits`);
+  getMonthlyDeliveries(): Observable<{ month: string; count: number }[]> {
+    return this.http.get<{ month: string; count: number }[]>(`${this.apiUrl}/monthly-deliveries`);
   }
 
-  updateMonthlyProfit(month: string, profit: number): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/monthly-profits/${month}`, { profit });
+  updateMonthlyDelivery(month: string, count: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/monthly-deliveries/${month}`, { count });
   }
 
   deleteOrder(id: string): Observable<any> {

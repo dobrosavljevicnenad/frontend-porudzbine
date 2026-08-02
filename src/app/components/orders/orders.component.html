@@ -84,7 +84,6 @@
         </select>
         <input [(ngModel)]="newOrder.shade" name="shade" placeholder="Boja / ton" class="input-field" />
         <input [(ngModel)]="newOrder.price" name="price" type="number" placeholder="Cena (RSD)" class="input-field" />
-        <input [(ngModel)]="newOrder.profit" name="profit" type="number" placeholder="Profit (RSD)" class="input-field" />
       </div>
 
       <textarea [(ngModel)]="newOrder.comment" name="comment" placeholder="Komentar"
@@ -120,6 +119,13 @@
       </select>
     </div>
     <div class="flex items-center gap-2">
+      <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Status:</label>
+      <select [(ngModel)]="filterStatus" class="input-field !w-44 !py-1.5 text-sm">
+        <option [ngValue]="null">Svi</option>
+        <option *ngFor="let s of STATUSES" [ngValue]="s">{{ STATUS_LABELS[s] }}</option>
+      </select>
+    </div>
+    <div class="flex items-center gap-2">
       <label class="text-sm font-medium text-slate-600 dark:text-slate-400">Grupiši po:</label>
       <select [(ngModel)]="groupBy" class="input-field !w-40 !py-1.5 text-sm">
         <option value="none">Bez grupisanja</option>
@@ -150,35 +156,30 @@
       </div>
     </div>
 
-    <!-- Mesečna zarada -->
+    <!-- Isporučene maske po mesecima -->
     <div class="card p-5 space-y-3">
-      <p class="section-title">📊 Zarada po mesecima</p>
+      <p class="section-title">📊 Isporučene maske po mesecima</p>
       <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
         <div *ngFor="let stat of monthlyStats; trackBy: trackByMonth"
           class="flex items-center justify-between rounded-xl px-3 py-2 text-sm"
-          [class.bg-emerald-50]="stat.isCurrent"
-          [class.dark:bg-emerald-950\/30]="stat.isCurrent"
-          [class.border]="stat.isCurrent"
-          [class.border-emerald-200]="stat.isCurrent"
-          [class.dark:border-emerald-800]="stat.isCurrent"
-          [class.bg-slate-50]="!stat.isCurrent"
-          [class.dark:bg-slate-900\/50]="!stat.isCurrent">
+          [ngClass]="stat.isCurrent
+            ? 'bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800'
+            : 'bg-slate-50 dark:bg-slate-900/50'">
 
           <span class="text-slate-600 dark:text-slate-400 font-medium">{{ stat.label }}</span>
 
-          <div *ngIf="editingProfitMonth !== stat.month" class="flex items-center gap-3">
-            <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ stat.profit | number }} RSD</span>
-            <span class="text-slate-400 text-xs">{{ stat.boards }} tabli</span>
-            <button (click)="startEditProfit(stat.month, stat.profit)"
+          <div *ngIf="editingDeliveryMonth !== stat.month" class="flex items-center gap-3">
+            <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ stat.count | number }} maski</span>
+            <button (click)="startEditDelivery(stat.month, stat.count)"
               class="text-xs px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 transition">
               Izmeni
             </button>
           </div>
 
-          <div *ngIf="editingProfitMonth === stat.month" class="flex items-center gap-1.5">
-            <input type="number" [(ngModel)]="editingProfitValue" class="input-field !w-28 !py-0.5 text-sm" />
-            <button (click)="saveProfit()" class="text-xs px-2 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Sačuvaj</button>
-            <button (click)="editingProfitMonth = null" class="text-xs px-2 py-1 bg-slate-400 text-white rounded-lg hover:bg-slate-500 transition">✕</button>
+          <div *ngIf="editingDeliveryMonth === stat.month" class="flex items-center gap-1.5">
+            <input type="number" [(ngModel)]="editingDeliveryValue" class="input-field !w-28 !py-0.5 text-sm" />
+            <button (click)="saveDelivery()" class="text-xs px-2 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Sačuvaj</button>
+            <button (click)="editingDeliveryMonth = null" class="text-xs px-2 py-1 bg-slate-400 text-white rounded-lg hover:bg-slate-500 transition">✕</button>
           </div>
         </div>
       </div>
@@ -207,6 +208,7 @@
             <div>
               <h3 class="font-bold text-slate-900 dark:text-slate-100">{{ o.firstName }} {{ o.lastName }}</h3>
               <div class="flex gap-2 mt-0.5">
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium" [ngClass]="STATUS_BADGE_CLASSES[o.status || 'PORUCENO']">{{ STATUS_LABELS[o.status || 'PORUCENO'] }}</span>
                 <span *ngIf="o.tura" class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full font-medium">Tura {{ o.tura }}</span>
                 <span *ngIf="o.city" class="text-xs bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">📍 {{ o.city }}</span>
                 <span *ngIf="o.shade" class="text-xs bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full">🎨 {{ o.shade }}</span>
@@ -240,15 +242,19 @@
               <div class="field-row sm:col-span-2"><span class="field-label">Komentar</span><span class="field-value">{{ o.comment || '—' }}</span></div>
             </div>
 
-            <!-- Cena / Profit -->
+            <!-- Cena / Status -->
             <div class="flex gap-4 pt-1">
               <div class="flex-1 bg-slate-50 dark:bg-slate-900/50 rounded-xl px-4 py-2.5 text-center border border-slate-200 dark:border-slate-700">
                 <p class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">Cena</p>
                 <p class="font-bold text-slate-800 dark:text-slate-200">{{ o.price ? (o.price | number) + ' RSD' : '—' }}</p>
               </div>
-              <div class="flex-1 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl px-4 py-2.5 text-center border border-emerald-200 dark:border-emerald-800">
-                <p class="text-xs text-emerald-600 dark:text-emerald-400 mb-0.5">Profit</p>
-                <p class="font-bold text-emerald-700 dark:text-emerald-300">{{ o.profit ? (o.profit | number) + ' RSD' : '—' }}</p>
+              <div class="flex-1 rounded-xl px-4 py-2.5 text-center" [ngClass]="STATUS_BADGE_CLASSES[o.status || 'PORUCENO']">
+                <p class="text-xs mb-0.5 opacity-70">Status</p>
+                <select
+                  class="w-full bg-transparent border-0 ring-0 focus:outline-none focus:ring-0 text-sm font-bold text-center cursor-pointer"
+                  [ngModel]="o.status || 'PORUCENO'" (ngModelChange)="changeStatus(o, $event)">
+                  <option *ngFor="let s of STATUSES" [value]="s">{{ STATUS_LABELS[s] }}</option>
+                </select>
               </div>
             </div>
 
@@ -285,7 +291,9 @@
               </select>
               <input [(ngModel)]="eo.shade" placeholder="Boja / ton" class="input-field" />
               <input [(ngModel)]="eo.price" type="number" placeholder="Cena (RSD)" class="input-field" />
-              <input [(ngModel)]="eo.profit" type="number" placeholder="Profit (RSD)" class="input-field" />
+              <select [(ngModel)]="eo.status" class="input-field">
+                <option *ngFor="let s of STATUSES" [value]="s">{{ STATUS_LABELS[s] }}</option>
+              </select>
             </div>
 
             <textarea [(ngModel)]="eo.comment" placeholder="Komentar" class="input-field min-h-[80px]"></textarea>
