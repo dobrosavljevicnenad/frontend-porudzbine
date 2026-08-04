@@ -290,16 +290,47 @@ Komentar: /`;
     return o.images ?? (o.imageBase64 ? [o.imageBase64] : []);
   }
 
-  private pushImage(dataUrl: string) {
-    const target = this.editingOrder ?? this.newOrder;
-    if (!target.images) target.images = [];
-    target.images.push(dataUrl);
+  // Slike se čuvaju kao base64 tekst unutar porudžbine, i CELA lista slika
+  // se šalje na svako čuvanje — nesažete fotke (npr. sa telefona, nekoliko
+  // MB svaka) zato čine da "Sačuvaj" traje sporo. Ovo ih pre dodavanja smanji
+  // na razumnu rezoluciju/kvalitet da čuvanje ostane brzo.
+  private compressImage(dataUrl: string, maxDim = 1600, quality = 0.85): Promise<string> {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const scale = maxDim / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { resolve(dataUrl); return; }
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => resolve(dataUrl); // ako ne uspe, zadrži original
+      img.src = dataUrl;
+    });
+  }
+
+  private addImageTo(target: 'new' | 'edit', dataUrl: string) {
+    this.compressImage(dataUrl).then(compressed => {
+      const bucket = target === 'new' ? this.newOrder : this.editingOrder;
+      if (!bucket) return;
+      if (!bucket.images) bucket.images = [];
+      bucket.images.push(compressed);
+    });
   }
 
   @HostListener('window:paste', ['$event'])
   onGlobalPaste(event: ClipboardEvent) {
     const items = event.clipboardData?.items;
     if (!items) return;
+    const target: 'new' | 'edit' = this.editingOrder ? 'edit' : 'new';
     let handled = false;
     for (const item of Array.from(items)) {
       if (item.type.startsWith('image/')) {
@@ -307,7 +338,7 @@ Komentar: /`;
         if (!file) continue;
         handled = true;
         const reader = new FileReader();
-        reader.onload = () => this.pushImage(reader.result as string);
+        reader.onload = () => this.addImageTo(target, reader.result as string);
         reader.readAsDataURL(file);
       }
     }
@@ -320,15 +351,7 @@ Komentar: /`;
     if (!files || !files.length) return;
     Array.from(files).forEach(file => {
       const reader = new FileReader();
-      reader.onload = () => {
-        if (target === 'new') {
-          if (!this.newOrder.images) this.newOrder.images = [];
-          this.newOrder.images.push(reader.result as string);
-        } else if (this.editingOrder) {
-          if (!this.editingOrder.images) this.editingOrder.images = [];
-          this.editingOrder.images.push(reader.result as string);
-        }
-      };
+      reader.onload = () => this.addImageTo(target, reader.result as string);
       reader.readAsDataURL(file);
     });
     input.value = ''; // omogućava ponovni izbor istog fajla
@@ -355,7 +378,16 @@ Komentar: /`;
   }
 
   editOrder(order: Order) {
-    this.editingOrder = { ...order, images: this.orderImages(order).slice() };
+    const rawImages = this.orderImages(order);
+    // Prikaži odmah (bez čekanja), a u pozadini sažmi postojeće slike —
+    // ako su stare/velike, čuvanje će posle ovoga opet biti brzo.
+    this.editingOrder = { ...order, images: rawImages.slice() };
+    Promise.all(rawImages.map(img => this.compressImage(img))).then(compressed => {
+      const current = this.editingOrder;
+      if (current && current._id === order._id) {
+        current.images = compressed;
+      }
+    });
   }
 
   cancelEdit() {
