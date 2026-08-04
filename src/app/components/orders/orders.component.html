@@ -6,8 +6,8 @@
     <h1 class="font-display text-3xl sm:text-4xl font-bold mt-1">Radni nalozi</h1>
   </div>
 
-  <!-- ── Sablon za ChatGPT ── -->
-  <div class="card border-l-[3px] border-l-blade p-5 space-y-3">
+  <!-- ── Sablon za ChatGPT ── (privremeno sakriveno) -->
+  <div *ngIf="showQuickTools" class="card border-l-[3px] border-l-blade p-5 space-y-3">
     <div class="flex justify-between items-center">
       <div>
         <p class="eyebrow">Referenca</p>
@@ -33,8 +33,8 @@
     </div>
   </div>
 
-  <!-- ── Brzo popunjavanje ── -->
-  <div class="card border-l-[3px] border-l-resin p-5 space-y-3">
+  <!-- ── Brzo popunjavanje ── (privremeno sakriveno) -->
+  <div *ngIf="showQuickTools" class="card border-l-[3px] border-l-resin p-5 space-y-3">
     <p class="eyebrow">Alat</p>
     <h2 class="font-display text-lg font-semibold -mt-1.5">Brzo popunjavanje</h2>
     <p class="text-sm text-charcoal/55 dark:text-steel/50">Nalepite tekst od klijenta — sva polja ispod će se automatski popuniti.</p>
@@ -80,16 +80,18 @@
         class="input-field min-h-[80px]"></textarea>
 
       <div class="space-y-2">
-        <p class="eyebrow">Crtež (opciono)</p>
+        <p class="eyebrow">Crteži (opciono)</p>
         <div class="flex items-center gap-3 flex-wrap">
-          <input type="file" accept="image/*" (change)="onImageSelected($event, 'new')"
+          <input type="file" accept="image/*" multiple (change)="onImageSelected($event, 'new')"
             class="text-sm text-charcoal/60 dark:text-steel/55 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-rust/10 file:text-rust-dark dark:file:text-rust-light hover:file:bg-rust/20 transition" />
-          <span class="text-xs text-charcoal/40 dark:text-steel/35 italic">ili Ctrl+V za nalepljivanje</span>
+          <span class="text-xs text-charcoal/40 dark:text-steel/35 italic">ili Ctrl+V za nalepljivanje (može više odjednom)</span>
         </div>
-        <div *ngIf="newOrder.imageBase64" class="relative inline-block">
-          <img [src]="newOrder.imageBase64" class="max-h-48 rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
-          <button type="button" (click)="removeImage('new')"
-            class="absolute top-1 right-1 bg-rust text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-rust-dark leading-none">✕</button>
+        <div *ngIf="newOrder.images?.length" class="flex flex-wrap gap-3">
+          <div *ngFor="let img of newOrder.images; let i = index" class="relative inline-block">
+            <img [src]="img" class="max-h-48 rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
+            <button type="button" (click)="removeImage('new', i)"
+              class="absolute top-1 right-1 bg-rust text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-rust-dark leading-none">✕</button>
+          </div>
         </div>
       </div>
 
@@ -198,9 +200,9 @@
               <p class="font-mono text-[11px] text-charcoal/35 dark:text-steel/35">№ {{ ticketCode(o) }}</p>
               <h3 class="font-display font-bold text-lg leading-tight mt-0.5">{{ o.firstName }} {{ o.lastName }}</h3>
               <div class="flex gap-1.5 mt-2 flex-wrap">
-                <span *ngIf="o.tura" class="chip"><b>Tura</b>{{ o.tura }}</span>
-                <span *ngIf="o.city" class="chip"><b>Grad</b>{{ o.city }}</span>
+                <span *ngIf="o.maskModel" class="chip"><b>Model</b>{{ o.maskModel }}</span>
                 <span *ngIf="o.shade" class="chip"><b>Boja</b>{{ o.shade }}</span>
+                <span *ngIf="o.maskDimensions" class="chip"><b>Dimenzije</b>{{ o.maskDimensions }}</span>
               </div>
             </div>
             <div *ngIf="editingOrder?._id !== o._id" class="flex gap-2 shrink-0">
@@ -236,6 +238,8 @@
 
             <!-- Fields grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-0">
+              <div class="field-row"><span class="field-label">Tura</span><span class="field-value">{{ o.tura || '—' }}</span></div>
+              <div class="field-row"><span class="field-label">Grad</span><span class="field-value">{{ o.city || '—' }}</span></div>
               <div class="field-row"><span class="field-label">Kontakt mesto</span><span class="field-value">{{ o.contactPlace || '—' }}</span></div>
               <div class="field-row"><span class="field-label">Telefon</span><span class="field-value">{{ o.phone || '—' }}</span></div>
               <div class="field-row"><span class="field-label">Adresa</span><span class="field-value">{{ o.address || '—' }}</span></div>
@@ -253,12 +257,16 @@
               <span class="font-mono text-lg font-semibold">{{ o.price ? (o.price | number) + ' RSD' : '—' }}</span>
             </div>
 
-            <!-- Crtež -->
+            <!-- Crteži -->
             <div>
-              <p class="eyebrow">Crtež</p>
-              <img *ngIf="o.imageBase64" [src]="o.imageBase64"
-                class="max-w-full rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag mt-1" />
-              <p *ngIf="!o.imageBase64" class="text-sm text-charcoal/35 dark:text-steel/30 italic">Nije dodata slika</p>
+              <p class="eyebrow">Crteži</p>
+              <div *ngIf="orderImages(o).length; else noImage" class="flex flex-wrap gap-3 mt-1">
+                <img *ngFor="let img of orderImages(o)" [src]="img"
+                  class="max-h-64 rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
+              </div>
+              <ng-template #noImage>
+                <p class="text-sm text-charcoal/35 dark:text-steel/30 italic">Nije dodata slika</p>
+              </ng-template>
             </div>
 
             <p class="font-mono text-[11px] text-charcoal/35 dark:text-steel/30 text-right">Kreirano: {{ o.createdAt | date:'short' }}</p>
@@ -294,18 +302,20 @@
             <textarea [(ngModel)]="eo.comment" placeholder="Komentar" class="input-field min-h-[80px]"></textarea>
 
             <div class="space-y-2">
-              <p class="eyebrow">Crtež</p>
+              <p class="eyebrow">Crteži</p>
               <div class="flex items-center gap-3 flex-wrap">
-                <input type="file" accept="image/*" (change)="onImageSelected($event, 'edit')"
+                <input type="file" accept="image/*" multiple (change)="onImageSelected($event, 'edit')"
                   class="text-sm text-charcoal/60 dark:text-steel/55 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-rust/10 file:text-rust-dark dark:file:text-rust-light hover:file:bg-rust/20 transition" />
-                <span class="text-xs text-charcoal/40 dark:text-steel/35 italic">ili Ctrl+V</span>
+                <span class="text-xs text-charcoal/40 dark:text-steel/35 italic">ili Ctrl+V (može više odjednom)</span>
               </div>
-              <div *ngIf="eo.imageBase64" class="relative inline-block">
-                <img [src]="eo.imageBase64" class="max-h-48 rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
-                <button type="button" (click)="removeImage('edit')"
-                  class="absolute top-1 right-1 bg-rust text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-rust-dark leading-none">✕</button>
+              <div *ngIf="eo.images?.length" class="flex flex-wrap gap-3">
+                <div *ngFor="let img of eo.images; let i = index" class="relative inline-block">
+                  <img [src]="img" class="max-h-48 rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
+                  <button type="button" (click)="removeImage('edit', i)"
+                    class="absolute top-1 right-1 bg-rust text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-rust-dark leading-none">✕</button>
+                </div>
               </div>
-              <p *ngIf="!eo.imageBase64" class="text-xs text-charcoal/35 dark:text-steel/30 italic">Nije dodata slika</p>
+              <p *ngIf="!eo.images?.length" class="text-xs text-charcoal/35 dark:text-steel/30 italic">Nije dodata slika</p>
             </div>
 
             <div class="flex justify-end gap-2 pt-1">

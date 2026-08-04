@@ -18,10 +18,13 @@ function isDeliveredResponse(value: any): value is OrderDeliveredResponse {
 export class OrdersComponent implements OnInit {
   orders: Order[] = [];
   editingOrder: Order | null = null;
-  newOrder: Partial<Order> = { treatment: 'plastifikacija' };
+  newOrder: Partial<Order> = { treatment: 'plastifikacija', images: [] };
   filterTura: number | null = null;
   filterStatus: OrderStatus | null = null;
   groupBy: 'none' | 'city' | 'shade' = 'none';
+
+  // Šablon za ChatGPT i Brzo popunjavanje su privremeno sakriveni.
+  showQuickTools = false;
 
   readonly STATUSES: OrderStatus[] = ['PORUCENO', 'ISECENO', 'PLASTIFICIRANO', 'ISPORUCENO'];
   readonly STATUS_LABELS: Record<OrderStatus, string> = {
@@ -245,7 +248,7 @@ Komentar: /`;
 
       this.loadStock();
 
-      this.newOrder = { treatment: 'plastifikacija', tura: 1, quantity: 1 };
+      this.newOrder = { treatment: 'plastifikacija', tura: 1, quantity: 1, images: [] };
     });
   }
 
@@ -279,48 +282,63 @@ Komentar: /`;
 
   get eo(): Order { return this.editingOrder!; }
 
+  // Stare porudžbine su čuvale samo jednu sliku u imageBase64 — ovo ih
+  // pretvara u niz da bi se prikazivale i uređivale na isti način kao nove.
+  orderImages(o: Order): string[] {
+    // "??" (a ne dužina niza) pravi razliku između "stara porudžbina bez
+    // images polja" i "images polje postoji ali je namerno ispraznjeno".
+    return o.images ?? (o.imageBase64 ? [o.imageBase64] : []);
+  }
+
+  private pushImage(dataUrl: string) {
+    const target = this.editingOrder ?? this.newOrder;
+    if (!target.images) target.images = [];
+    target.images.push(dataUrl);
+  }
+
   @HostListener('window:paste', ['$event'])
   onGlobalPaste(event: ClipboardEvent) {
     const items = event.clipboardData?.items;
     if (!items) return;
+    let handled = false;
     for (const item of Array.from(items)) {
       if (item.type.startsWith('image/')) {
         const file = item.getAsFile();
-        if (!file) return;
+        if (!file) continue;
+        handled = true;
         const reader = new FileReader();
-        reader.onload = () => {
-          if (this.editingOrder) {
-            this.editingOrder.imageBase64 = reader.result as string;
-          } else {
-            this.newOrder.imageBase64 = reader.result as string;
-          }
-        };
+        reader.onload = () => this.pushImage(reader.result as string);
         reader.readAsDataURL(file);
-        event.preventDefault();
-        break;
       }
     }
+    if (handled) event.preventDefault();
   }
 
   onImageSelected(event: Event, target: 'new' | 'edit') {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (target === 'new') {
-        this.newOrder.imageBase64 = reader.result as string;
-      } else if (this.editingOrder) {
-        this.editingOrder.imageBase64 = reader.result as string;
-      }
-    };
-    reader.readAsDataURL(file);
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    if (!files || !files.length) return;
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (target === 'new') {
+          if (!this.newOrder.images) this.newOrder.images = [];
+          this.newOrder.images.push(reader.result as string);
+        } else if (this.editingOrder) {
+          if (!this.editingOrder.images) this.editingOrder.images = [];
+          this.editingOrder.images.push(reader.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    input.value = ''; // omogućava ponovni izbor istog fajla
   }
 
-  removeImage(target: 'new' | 'edit') {
+  removeImage(target: 'new' | 'edit', index: number) {
     if (target === 'new') {
-      this.newOrder.imageBase64 = undefined;
+      this.newOrder.images?.splice(index, 1);
     } else if (this.editingOrder) {
-      this.editingOrder.imageBase64 = undefined;
+      this.editingOrder.images?.splice(index, 1);
     }
   }
 
@@ -337,7 +355,7 @@ Komentar: /`;
   }
 
   editOrder(order: Order) {
-    this.editingOrder = { ...order };
+    this.editingOrder = { ...order, images: this.orderImages(order).slice() };
   }
 
   cancelEdit() {

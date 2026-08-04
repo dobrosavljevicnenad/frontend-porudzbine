@@ -22,7 +22,8 @@ export interface Order {
   price?: number;
   status?: OrderStatus;
   comment?: string;
-  imageBase64?: string;
+  imageBase64?: string; // zastarelo polje, ostavljeno zbog starih porudžbina
+  images?: string[];
   createdAt?: string;
 }
 
