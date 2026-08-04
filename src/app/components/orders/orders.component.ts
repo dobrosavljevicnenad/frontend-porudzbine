@@ -292,25 +292,34 @@ Komentar: /`;
 
   // Slike se čuvaju kao base64 tekst unutar porudžbine, i CELA lista slika
   // se šalje na svako čuvanje — nesažete fotke (npr. sa telefona, nekoliko
-  // MB svaka) zato čine da "Sačuvaj" traje sporo. Ovo ih pre dodavanja smanji
-  // na razumnu rezoluciju/kvalitet da čuvanje ostane brzo.
-  private compressImage(dataUrl: string, maxDim = 1600, quality = 0.85): Promise<string> {
+  // MB svaka) zato čine da "Sačuvaj" traje sporo. Slike su obično jednostavni
+  // screenshotovi gde kvalitet nije bitan, pa agresivno sažimamo (cilj: par
+  // desetina KB po slici) i po potrebi probamo još agresivnije ako ostane veliko.
+  private compressImage(dataUrl: string): Promise<string> {
     return new Promise(resolve => {
       const img = new Image();
       img.onload = () => {
-        let { width, height } = img;
-        if (width > maxDim || height > maxDim) {
-          const scale = maxDim / Math.max(width, height);
-          width = Math.round(width * scale);
-          height = Math.round(height * scale);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) { resolve(dataUrl); return; }
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
+        const render = (maxDim: number, quality: number): string => {
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            const scale = maxDim / Math.max(width, height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return dataUrl;
+          ctx.drawImage(img, 0, 0, width, height);
+          return canvas.toDataURL('image/jpeg', quality);
+        };
+
+        let result = render(1000, 0.5);
+        if (result.length > 300 * 1024) result = render(700, 0.35);
+        if (result.length > 300 * 1024) result = render(500, 0.25);
+
+        resolve(result.length < dataUrl.length ? result : dataUrl);
       };
       img.onerror = () => resolve(dataUrl); // ako ne uspe, zadrži original
       img.src = dataUrl;
