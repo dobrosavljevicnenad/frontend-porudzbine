@@ -86,9 +86,9 @@
             class="text-sm text-charcoal/60 dark:text-steel/55 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-rust/10 file:text-rust-dark dark:file:text-rust-light hover:file:bg-rust/20 transition" />
           <span class="text-xs text-charcoal/40 dark:text-steel/35 italic">ili Ctrl+V za nalepljivanje (može više odjednom)</span>
         </div>
-        <div *ngIf="newOrder.images?.length" class="flex flex-wrap gap-3">
-          <div *ngFor="let img of newOrder.images; let i = index" class="relative inline-block">
-            <img [src]="img" class="max-h-48 rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
+        <div *ngIf="newOrder.images?.length" class="grid grid-cols-1 gap-3">
+          <div *ngFor="let img of newOrder.images; let i = index" class="relative">
+            <img [src]="img" class="w-full h-auto rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
             <button type="button" (click)="removeImage('new', i)"
               class="absolute top-1 right-1 bg-rust text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-rust-dark leading-none">✕</button>
           </div>
@@ -260,9 +260,9 @@
             <!-- Crteži -->
             <div>
               <p class="eyebrow">Crteži</p>
-              <div *ngIf="orderImages(o).length; else noImage" class="flex flex-wrap gap-3 mt-1">
+              <div *ngIf="orderImages(o).length; else noImage" class="grid grid-cols-1 gap-3 mt-1">
                 <img *ngFor="let img of orderImages(o)" [src]="img"
-                  class="max-h-64 rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
+                  class="w-full h-auto rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
               </div>
               <ng-template #noImage>
                 <p class="text-sm text-charcoal/35 dark:text-steel/30 italic">Nije dodata slika</p>
@@ -308,9 +308,9 @@
                   class="text-sm text-charcoal/60 dark:text-steel/55 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-rust/10 file:text-rust-dark dark:file:text-rust-light hover:file:bg-rust/20 transition" />
                 <span class="text-xs text-charcoal/40 dark:text-steel/35 italic">ili Ctrl+V (može više odjednom)</span>
               </div>
-              <div *ngIf="eo.images?.length" class="flex flex-wrap gap-3">
-                <div *ngFor="let img of eo.images; let i = index" class="relative inline-block">
-                  <img [src]="img" class="max-h-48 rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
+              <div *ngIf="eo.images?.length" class="grid grid-cols-1 gap-3">
+                <div *ngFor="let img of eo.images; let i = index" class="relative">
+                  <img [src]="img" class="w-full h-auto rounded-md border border-charcoal/10 dark:border-steel/10 shadow-tag" />
                   <button type="button" (click)="removeImage('edit', i)"
                     class="absolute top-1 right-1 bg-rust text-white rounded-full w-6 h-6 text-xs font-bold hover:bg-rust-dark leading-none">✕</button>
                 </div>
