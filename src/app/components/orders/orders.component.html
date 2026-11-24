@@ -59,6 +59,11 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <input [(ngModel)]="newOrder.firstName" name="firstName" placeholder="Ime" required class="input-field" />
         <input [(ngModel)]="newOrder.lastName" name="lastName" placeholder="Prezime" required class="input-field" />
+        <select [(ngModel)]="newOrder.maskType" name="maskType" required class="input-field" aria-label="Vrsta maske">
+          <option [ngValue]="undefined" disabled>Izaberi vrstu maske</option>
+          <option value="klima">Maska za klimu</option>
+          <option value="radijator">Maska za radijator</option>
+        </select>
         <input [(ngModel)]="newOrder.contactPlace" name="contactPlace" placeholder="Kontakt mesto" class="input-field" />
         <input [(ngModel)]="newOrder.tura" name="tura" type="number" placeholder="Tura" class="input-field" />
         <input [(ngModel)]="newOrder.quantity" name="kolicina" type="number" placeholder="Količina" class="input-field" />
@@ -68,10 +73,6 @@
         <input [(ngModel)]="newOrder.city" name="city" placeholder="Grad" class="input-field" />
         <input [(ngModel)]="newOrder.address" name="address" placeholder="Adresa" class="input-field" />
         <input [(ngModel)]="newOrder.phone" name="phone" placeholder="Telefon" class="input-field" />
-        <select [(ngModel)]="newOrder.treatment" name="treatment" class="input-field">
-          <option value="plastifikacija">Plastifikacija</option>
-          <option value="farbanje">Farbanje</option>
-        </select>
         <input [(ngModel)]="newOrder.shade" name="shade" placeholder="Boja / ton" class="input-field" />
         <input [(ngModel)]="newOrder.price" name="price" type="number" placeholder="Cena (RSD)" class="input-field" />
       </div>
@@ -103,6 +104,14 @@
 
   <!-- ── Filter + Grupisanje ── -->
   <div class="card px-5 py-4 flex flex-wrap items-center gap-6">
+    <div class="flex items-center gap-2">
+      <label for="filterMaskType" class="text-sm font-medium text-charcoal/60 dark:text-steel/55">Vrsta maske:</label>
+      <select id="filterMaskType" [(ngModel)]="filterMaskType" class="input-field !w-44 !py-1.5 text-sm">
+        <option [ngValue]="null">Sve</option>
+        <option value="klima">Za klimu</option>
+        <option value="radijator">Za radijator</option>
+      </select>
+    </div>
     <div class="flex items-center gap-2">
       <label class="text-sm font-medium text-charcoal/60 dark:text-steel/55">Tura:</label>
       <select [(ngModel)]="filterTura" class="input-field !w-36 !py-1.5 text-sm">
@@ -247,7 +256,7 @@
               <div class="field-row"><span class="field-label">Dim. klime</span><span class="field-value">{{ o.klimaDimensions || '—' }}</span></div>
               <div class="field-row"><span class="field-label">Dim. maske</span><span class="field-value">{{ o.maskDimensions || '—' }}</span></div>
               <div class="field-row"><span class="field-label">Model maske</span><span class="field-value">{{ o.maskModel || '—' }}</span></div>
-              <div class="field-row"><span class="field-label">Zaštita</span><span class="field-value">{{ o.treatment || '—' }}</span></div>
+              <div class="field-row"><span class="field-label">Vrsta maske</span><span class="field-value">{{ o.maskType === 'klima' ? 'Za klimu' : o.maskType === 'radijator' ? 'Za radijator' : 'Nije određena' }}</span></div>
               <div class="field-row sm:col-span-2"><span class="field-label">Komentar</span><span class="field-value !text-left sm:!text-right font-sans">{{ o.comment || '—' }}</span></div>
             </div>
 
@@ -279,6 +288,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input [(ngModel)]="eo.firstName" placeholder="Ime" class="input-field" />
               <input [(ngModel)]="eo.lastName" placeholder="Prezime" class="input-field" />
+              <select [(ngModel)]="eo.maskType" class="input-field" aria-label="Vrsta maske">
+                <option [ngValue]="undefined">Vrsta maske nije određena</option>
+                <option value="klima">Maska za klimu</option>
+                <option value="radijator">Maska za radijator</option>
+              </select>
               <input [(ngModel)]="eo.contactPlace" placeholder="Kontakt mesto" class="input-field" />
               <input [(ngModel)]="eo.tura" type="number" placeholder="Tura" class="input-field" />
               <input [(ngModel)]="eo.quantity" type="number" placeholder="Količina" class="input-field" />
@@ -288,10 +302,6 @@
               <input [(ngModel)]="eo.city" placeholder="Grad" class="input-field" />
               <input [(ngModel)]="eo.address" placeholder="Adresa" class="input-field" />
               <input [(ngModel)]="eo.phone" placeholder="Telefon" class="input-field" />
-              <select [(ngModel)]="eo.treatment" class="input-field">
-                <option value="plastifikacija">Plastifikacija</option>
-                <option value="farbanje">Farbanje</option>
-              </select>
               <input [(ngModel)]="eo.shade" placeholder="Boja / ton" class="input-field" />
               <input [(ngModel)]="eo.price" type="number" placeholder="Cena (RSD)" class="input-field" />
               <select [(ngModel)]="eo.status" class="input-field">
