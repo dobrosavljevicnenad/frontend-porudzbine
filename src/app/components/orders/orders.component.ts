@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { OrderService, Order, OrderStatus, OrderDeliveredResponse } from '../../services/order.service';
+import { OrderService, Order, OrderStatus, OrderDeliveredResponse, MaskType } from '../../services/order.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -21,6 +21,7 @@ export class OrdersComponent implements OnInit {
   newOrder: Partial<Order> = { treatment: 'plastifikacija', images: [] };
   filterTura: number | null = null;
   filterStatus: OrderStatus | null = null;
+  filterMaskType: MaskType | null = null;
   groupBy: 'none' | 'city' | 'shade' = 'none';
 
   // Šablon za ChatGPT i Brzo popunjavanje su privremeno sakriveni.
@@ -217,7 +218,8 @@ Komentar: /`;
   get filteredOrders(): Order[] {
     return this.orders.filter(o =>
       (this.filterTura === null || o.tura === this.filterTura) &&
-      (this.filterStatus === null || o.status === this.filterStatus)
+      (this.filterStatus === null || o.status === this.filterStatus) &&
+      (this.filterMaskType === null || o.maskType === this.filterMaskType)
     );
   }
 
@@ -241,7 +243,7 @@ Komentar: /`;
   }
 
   addOrder() {
-    if (!this.newOrder.firstName) return;
+    if (!this.newOrder.firstName || !this.newOrder.maskType) return;
 
     this.orderService.createOrder(this.newOrder as Order).subscribe(order => {
       this.orders.unshift(order); // dodaje order na pocetak orders liste

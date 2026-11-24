@@ -3,11 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export type OrderStatus = 'PORUCENO' | 'ISECENO' | 'PLASTIFICIRANO' | 'ISPORUCENO';
+export type MaskType = 'klima' | 'radijator';
 
 export interface Order {
   _id?: string;
   firstName: string;
   lastName: string;
+  maskType?: MaskType;
   tura: number;
   quantity: number;
   contactPlace?: string;
